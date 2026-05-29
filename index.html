@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHART HR診断 | スタッフ自己分析ツール</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #ffffff;
+    --white: #1a1a1a;
+    --cream: #f5f5f5;
+    --gold: #c79a3a;
+    --gold-light: #a8852c;
+    --gold-bright: #d4aa50;
+    --dark-bg: #0d0d0d;
+    --gray-dark: #f5f5f5;
+    --gray-mid: #eeeeee;
+    --gray-light: #888888;
+    --text-main: #1a1a1a;
+    --text-sub: #333333;
+    --text-dim: #555555;
+    --border: #dddddd;
+    --border-light: #cccccc;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#ffffff; color:var(--text-main); font-family:'Noto Sans JP',sans-serif; font-weight:400; line-height:1.75; min-height:100vh; }
+
+.header { background:var(–dark-bg); padding:32px 24px 26px; display:flex; align-items:flex-end; gap:18px; position:sticky; top:0; z-index:100; }
+.header-logo { font-family:‘Bebas Neue’,sans-serif; font-size:46px; color:var(–gold-bright); letter-spacing:6px; line-height:1; }
+.header-sub { font-size:10px; letter-spacing:3px; color:#888; text-transform:uppercase; padding-bottom:4px; line-height:1.5; }
+
+.container { max-width:860px; margin:0 auto; padding:0 24px; }
+.screen { display:none; }
+.screen.active { display:block; }
+
+/* INTRO */
+.intro { padding:72px 0 56px; text-align:center; }
+.intro-eyebrow { font-size:10px; letter-spacing:4px; color:var(–gold); text-transform:uppercase; margin-bottom:20px; }
+.intro-title { font-family:‘Noto Sans JP’,sans-serif; font-weight:900; font-size:clamp(28px,6vw,44px); letter-spacing:4px; line-height:1.1; margin-bottom:20px; }
+.intro-title span { color:var(–gold); }
+.intro-desc { font-size:14px; color:var(–text-sub); max-width:500px; margin:0 auto 44px; line-height:1.95; }
+
+.input-form { background:var(–gray-dark); border:1px solid var(–border); border-top:2px solid var(–gold); padding:36px; margin-bottom:36px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; }
+.form-group label { display:block; font-size:10px; letter-spacing:2px; color:var(–gold); text-transform:uppercase; margin-bottom:10px; }
+.form-group input, .form-group select { width:100%; background:var(–black); border:1px solid var(–border-light); color:var(–text-main); padding:12px 16px; font-family:‘Noto Sans JP’,sans-serif; font-size:14px; outline:none; transition:border-color .2s; }
+.form-group input:focus, .form-group select:focus { border-color:var(–gold); }
+.form-group select option { background:var(–black); }
+
+.btn { display:inline-block; padding:16px 48px; font-family:‘Noto Sans JP’,sans-serif; font-size:13px; font-weight:700; letter-spacing:2px; cursor:pointer; border:none; transition:all .2s; }
+.btn-primary { background:var(–gold); color:var(–black); }
+.btn-primary:hover { background:var(–gold-light); }
+.btn-outline { background:transparent; border:1px solid var(–gold); color:var(–gold); }
+.btn-outline:hover { background:var(–gold); color:var(–black); }
+
+/* PROGRESS */
+.progress-bar-wrap { position:sticky; top:0; z-index:10; background:var(–black); border-bottom:1px solid var(–border); padding:14px 40px; display:flex; align-items:center; gap:20px; }
+.progress-label { font-family:‘DM Mono’,monospace; font-size:11px; color:var(–gold); white-space:nowrap; }
+.progress-track { flex:1; height:2px; background:var(–border); }
+.progress-fill { height:100%; background:var(–gold); transition:width .4s ease; }
+
+/* QUESTIONS */
+.question-area { padding:56px 0; }
+.question-block { display:none; animation:fadeUp .3s ease; }
+.question-block.active { display:block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.q-section { font-size:9px; letter-spacing:3px; color:var(–gold); text-transform:uppercase; margin-bottom:10px; }
+.q-number { font-family:‘Bebas Neue’,sans-serif; font-size:76px; color:var(–gray-mid); line-height:1; position:absolute; right:0; top:-14px; }
+.q-wrap { position:relative; }
+.q-text { font-size:20px; font-weight:700; line-height:1.6; margin-bottom:32px; padding-right:76px; color:var(–white); }
+.options { display:flex; flex-direction:column; gap:10px; }
+.option { display:flex; align-items:center; gap:16px; padding:16px 20px; border:1px solid var(–border-light); cursor:pointer; transition:all .15s; background:var(–gray-dark); }
+.option:hover { border-color:var(–gold); background:var(–gray-mid); }
+.option.selected { border-color:var(–gold); background:rgba(212,170,80,0.14); }
+.option-key { font-family:‘DM Mono’,monospace; font-size:10px; color:var(–gold); min-width:16px; }
+.option-text { font-size:14px; color:var(–text-main); }
+.nav-buttons { display:flex; gap:16px; margin-top:44px; }
+
+/* LOADING */
+.loading-screen { padding:120px 0; text-align:center; }
+.loading-bars { display:flex; gap:6px; justify-content:center; margin-bottom:28px; }
+.loading-bars span { display:block; width:3px; height:36px; background:var(–gold); animation:barPulse 1s ease-in-out infinite; }
+.loading-bars span:nth-child(2){animation-delay:.1s} .loading-bars span:nth-child(3){animation-delay:.2s}
+.loading-bars span:nth-child(4){animation-delay:.3s} .loading-bars span:nth-child(5){animation-delay:.4s}
+.loading-bars span:nth-child(6){animation-delay:.5s}
+@keyframes barPulse { 0%,100%{transform:scaleY(.3);opacity:.3} 50%{transform:scaleY(1);opacity:1} }
+.loading-text { font-size:11px; letter-spacing:3px; color:var(–text-sub); text-transform:uppercase; }
+
+/* RESULT */
+.result-header { padding:56px 0 36px; border-bottom:1px solid var(–border); }
+.result-eyebrow { font-size:9px; letter-spacing:4px; color:var(–gold); text-transform:uppercase; margin-bottom:14px; }
+.result-name { font-family:‘Noto Sans JP’,sans-serif; font-size:clamp(26px,5vw,38px); font-weight:900; letter-spacing:0; margin-bottom:8px; color:var(–white); }
+.result-meta { font-size:13px; color:var(–text-sub); letter-spacing:1px; }
+
+.result-section { padding:44px 0; border-bottom:1px solid var(–border); }
+.section-label { font-size:9px; letter-spacing:4px; color:var(–gold); text-transform:uppercase; margin-bottom:16px; }
+.section-title { font-family:‘Noto Sans JP’,sans-serif; font-size:22px; font-weight:900; letter-spacing:0; margin-bottom:22px; color:var(–white); }
+
+/* MBTI */
+.mbti-type { font-family:‘Bebas Neue’,sans-serif; font-size:68px; color:var(–gold); letter-spacing:8px; line-height:1; margin-bottom:6px; }
+.mbti-name { font-size:16px; font-weight:700; margin-bottom:28px; color:var(–white); }
+.mbti-axes { display:flex; flex-direction:column; gap:14px; }
+.mbti-axis { display:grid; grid-template-columns:64px 1fr 64px; gap:12px; align-items:center; }
+.axis-left { font-size:12px; text-align:right; color:var(–text-sub); }
+.axis-right { font-size:12px; color:var(–text-sub); }
+.axis-bar { height:6px; background:#e8e8e8; position:relative; border-radius:3px; }
+.axis-fill-l { position:absolute; top:0; right:50%; height:100%; background:var(–gold); border-radius:3px 0 0 3px; }
+.axis-fill-r { position:absolute; top:0; left:50%; height:100%; background:var(–gold); border-radius:0 3px 3px 0; }
+.axis-center { position:absolute; top:-2px; left:50%; transform:translateX(-50%); width:2px; height:10px; background:#bbb; }
+.axis-left.active, .axis-right.active { font-weight:700; color:#111; }
+.axis-dot { position:absolute; top:50%; transform:translate(-50%,-50%); width:14px; height:14px; background:var(–gold); border-radius:50%; border:2px solid white; box-shadow:0 0 0 2px var(–gold); z-index:1; }
+
+/* IQ EQ */
+.score-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.score-card { background:var(–gray-dark); border:1px solid var(–border-light); padding:22px; }
+.score-card-label { font-size:9px; letter-spacing:3px; color:var(–gold); text-transform:uppercase; margin-bottom:10px; }
+.score-value { font-family:‘Bebas Neue’,sans-serif; font-size:48px; color:var(–white); line-height:1; margin-bottom:4px; }
+.score-range { font-family:‘DM Mono’,monospace; font-size:10px; color:var(–gold); margin-bottom:12px; }
+.score-desc { font-size:13px; color:var(–text-sub); line-height:1.75; }
+
+.eq-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:16px; }
+.eq-item { background:var(–gray-dark); border:1px solid var(–border-light); padding:18px; }
+.eq-item-label { font-size:10px; letter-spacing:2px; color:var(–gold); text-transform:uppercase; margin-bottom:8px; }
+.eq-bar-wrap { height:2px; background:var(–border-light); margin-bottom:8px; }
+.eq-bar-fill { height:100%; background:var(–gold); }
+.eq-score-val { font-family:‘DM Mono’,monospace; font-size:18px; color:var(–white); margin-bottom:6px; }
+.eq-desc { font-size:12px; color:var(–text-sub); line-height:1.65; }
+
+/* DEPT */
+.dept-grid { display:flex; flex-direction:column; gap:12px; }
+.dept-row { display:grid; grid-template-columns:180px 1fr 64px; align-items:center; gap:14px; }
+.dept-name { font-size:13px; font-weight:700; color:var(–text-main); }
+.dept-bar-wrap { height:4px; background:var(–border-light); }
+.dept-bar-fill { height:100%; background:var(–gold); }
+.dept-bar-fill.over100 { background:var(–gold-light); box-shadow:0 0 8px var(–gold); }
+.dept-score { font-family:‘DM Mono’,monospace; font-size:13px; color:var(–gold); text-align:right; }
+.dept-score.over100 { color:var(–gold-light); }
+
+.potential-depts { margin-top:28px; padding:22px; border:1px dashed var(–border-light); background:rgba(212,170,80,0.05); }
+.potential-label { font-size:9px; letter-spacing:3px; color:var(–gold); text-transform:uppercase; margin-bottom:12px; }
+.potential-list { display:flex; flex-wrap:wrap; gap:8px; }
+.potential-tag { padding:6px 14px; border:1px solid rgba(212,170,80,0.5); font-size:12px; color:var(–gold-light); }
+.potential-note { font-size:13px; color:var(–text-sub); margin-top:10px; line-height:1.75; }
+
+/* TEXT */
+.tag-list { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+.tag { padding:6px 14px; font-size:12px; letter-spacing:1px; }
+.tag-strength { background:rgba(212,170,80,0.15); border:1px solid rgba(212,170,80,0.6); color:var(–gold-light); }
+.tag-weakness { background:rgba(192,58,43,0.12); border:1px solid rgba(192,58,43,0.5); color:#f08070; }
+.text-block { font-size:14px; color:#1a1a1a; line-height:1.9; padding-left:16px; border-left:2px solid var(–gold); }
+
+.motive-card { background:var(–gray-dark); border:1px solid var(–border-light); border-left:3px solid var(–gold); padding:22px; margin-bottom:12px; }
+.motive-card h4 { font-size:10px; letter-spacing:2px; color:var(–gold); text-transform:uppercase; margin-bottom:10px; }
+.motive-card p { font-size:14px; color:var(–text-main); line-height:1.85; }
+
+/* ROADMAP */
+.roadmap { display:flex; flex-direction:column; }
+.roadmap { display:flex; flex-direction:column; gap:0; }
+.roadmap-step { display:block; position:relative; margin-bottom:10px; }
+.roadmap-content { background:#fafafa; border:1px solid #e0e0e0; border-left:4px solid var(–gold); padding:18px 20px; border-radius:4px; }
+.roadmap-content h4 { font-size:15px; font-weight:700; margin-bottom:5px; color:#1a1a1a; line-height:1.5; }
+.roadmap-content p { font-size:13px; color:#444; line-height:1.8; }
+/* ネイビー（中位職：エリア統括・内部部署など） */
+.roadmap-step.navy .roadmap-content { background:#0d1b2e; border:1px solid #2a5298; border-left:4px solid #4a7fd4; }
+.roadmap-step.navy .roadmap-content h4 { color:#7ab3f0; }
+.roadmap-step.navy .roadmap-content p { color:#a8c5e8; }
+/* 金黒エリート（最上位職：運営幹部・本部クラス） */
+.roadmap-step.elite .roadmap-content { background:#0d0d0d; border:1px solid var(–gold-bright); border-left:4px solid var(–gold-bright); box-shadow:0 2px 12px rgba(212,170,80,0.2); }
+.roadmap-step.elite .roadmap-content h4 { color:#f0cc70; font-size:16px; }
+.roadmap-step.elite .roadmap-content p { color:#d4c9a8; }
+.roadmap-arrow { text-align:center; color:var(–gold); font-size:20px; line-height:1; padding:2px 0 8px; }
+.roadmap-note { font-size:11px; color:#666; margin-top:14px; padding:10px 14px; border:1px dashed #ccc; line-height:1.7; border-radius:3px; }
+.top-badge { display:inline-block; background:var(–gold-bright); color:#0d0d0d; font-family:‘Bebas Neue’,sans-serif; font-size:11px; letter-spacing:1px; padding:2px 8px; border-radius:2px; margin-left:8px; vertical-align:middle; }
+
+/* ACTIONS */
+.action-list { display:flex; flex-direction:column; gap:10px; }
+.action-item { display:grid; grid-template-columns:28px 1fr; gap:14px; align-items:start; padding:14px 16px; background:var(–gray-dark); border:1px solid var(–border-light); }
+.action-num { font-family:‘Bebas Neue’,sans-serif; font-size:22px; color:var(–gold); line-height:1.2; }
+.action-text { font-size:14px; color:var(–text-main); line-height:1.75; }
+
+/* INTERVIEW */
+.interview-list { display:flex; flex-direction:column; gap:10px; }
+.interview-q { padding:14px 18px; background:var(–gray-dark); border-left:2px solid var(–gold); font-size:14px; color:var(–text-main); line-height:1.75; }
+
+/* COPY / LINE */
+.share-section { padding:44px 0 72px; text-align:center; }
+.share-buttons { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+.btn-share { padding:14px 32px; font-family:‘Noto Sans JP’,sans-serif; font-size:13px; font-weight:700; cursor:pointer; border:none; transition:all .2s; letter-spacing:1px; }
+.btn-copy-main { background:var(–gray-mid); color:var(–white); border:1px solid var(–border-light); }
+.btn-copy-main:hover { background:var(–border-light); }
+.btn-line { background:#06c755; color:#fff; }
+.btn-line:hover { background:#04a844; }
+.share-note { font-size:12px; color:var(–text-dim); }
+#copySuccess { display:none; font-size:12px; color:var(–gold); margin-top:8px; letter-spacing:2px; }
+
+/* COPY PREVIEW */
+.copy-preview-wrap { display:none; margin-top:32px; }
+.copy-preview-wrap.visible { display:block; }
+.copy-preview-label { font-size:9px; letter-spacing:3px; color:var(–gold); text-transform:uppercase; margin-bottom:12px; }
+.copy-preview-box { background:var(–gray-dark); border:1px solid var(–border-light); padding:24px; font-family:‘DM Mono’,monospace; font-size:12px; color:var(–text-sub); line-height:1.8; white-space:pre-wrap; word-break:break-all; max-height:400px; overflow-y:auto; text-align:left; }
+
+@media(max-width:600px){
+.header{padding:28px 16px 20px;} .header-logo{font-size:40px;}
+.container{padding:0 16px;} .form-row{grid-template-columns:1fr;}
+.score-grid{grid-template-columns:1fr;} .eq-grid{grid-template-columns:1fr;}
+.dept-row{grid-template-columns:130px 1fr 50px;} .q-number{font-size:60px;}
+}
+
+/* ===== v6: 最高職カード（黒背景・スクショ準拠） ===== */
+.exec-card { background:#0d0d0d; border:1px solid #d4aa50; padding:28px 26px; margin-bottom:16px; position:relative; overflow:hidden; border-radius:3px; }
+.exec-card::before { content:‘CHART’; position:absolute; bottom:-16px; right:-10px; font-family:‘Bebas Neue’,sans-serif; font-size:90px; color:rgba(212,170,80,0.06); pointer-events:none; letter-spacing:4px; }
+.exec-rank { font-family:‘Bebas Neue’,sans-serif; font-size:60px; line-height:1; margin-bottom:6px; position:relative; }
+.exec-rank.SS { color:#d4aa50; }
+.exec-rank.S { color:#c0c0c0; }
+.exec-rank.A { color:#cd7f32; }
+.exec-rank.B { color:#888; }
+.exec-title { font-size:18px; font-weight:700; color:#ffffff; margin-bottom:14px; position:relative; }
+.exec-score-bar-wrap { height:4px; background:#333; margin-bottom:14px; position:relative; }
+.exec-score-bar { height:100%; background:#d4aa50; }
+.exec-desc { font-size:13px; color:#bbbbbb; line-height:1.85; position:relative; }
+.exec-other-row { display:grid; grid-template-columns:1fr 50px 36px; gap:10px; align-items:center; padding:12px 16px; background:#161616; border:1px solid #262626; margin-bottom:5px; }
+.exec-other-name { font-size:12px; color:#999; }
+.exec-other-score { font-family:‘DM Mono’,monospace; font-size:12px; color:#777; text-align:right; }
+.exec-other-rank { font-family:‘Bebas Neue’,sans-serif; font-size:17px; color:#777; text-align:center; }
+.secret-option { display:flex; align-items:center; gap:16px; padding:15px 18px; border:1px solid #ddd; background:#f5f5f5; cursor:pointer; transition:all .15s; font-size:14px; color:#1a1a1a; border-radius:2px; margin-bottom:10px; }
+.secret-option:hover, .secret-option.selected { border-color:#d4aa50; background:rgba(212,170,80,0.1); }
+.secret-option-key { font-family:‘DM Mono’,monospace; font-size:10px; color:#c79a3a; min-width:16px; font-weight:700; }
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">CHART</div>
+  <div class="header-sub">Staff Self-Analysis / HR Diagnostic Tool</div>
+</div>
+
+<!-- INTRO -->
+
+<div id="screen-intro" class="screen active">
+  <div class="container">
+    <div class="intro">
+      <div class="intro-eyebrow">CHART Internal HR Diagnosis</div>
+      <h1 class="intro-title">あなたの<span>強み</span>と<br>可能性を可視化する</h1>
+      <p class="intro-desc">30の質問に答えることで、あなたの特性・適性・潜在欲求を分析します。結果はあなた自身と面談担当者が共有し、キャリアの方向性を一緒に考えるための材料として活用します。</p>
+      <div class="input-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>フルネーム</label>
+            <input type="text" id="input-name" placeholder="山田 太郎">
+          </div>
+          <div class="form-group">
+            <label>性別</label>
+            <select id="input-gender">
+              <option value="">選択してください</option>
+              <option value="male">男性</option>
+              <option value="female">女性</option>
+              <option value="other">その他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>年齢</label>
+            <input type="number" id="input-age" placeholder="25" min="18" max="60">
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="startDiagnosis()">診断をはじめる</button>
+
+```
+</div>
+```
+
+  </div>
+</div>
+
+<!-- QUESTIONS -->
+
+<div id="screen-questions" class="screen">
+  <div class="progress-bar-wrap">
+    <span class="progress-label" id="progress-label">Q1 / 30</span>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:4%"></div></div>
+  </div>
+  <div class="container">
+    <div class="question-area" id="question-area"></div>
+  </div>
+</div>
+
+<!-- LOADING -->
+
+<div id="screen-loading" class="screen">
+  <div class="container">
+    <div class="loading-screen">
+      <div class="loading-bars"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="loading-text" id="loading-text">分析中...</div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+
+<div id="screen-result" class="screen">
+  <div class="container">
+
+```
+<div class="result-header">
+  <div class="result-eyebrow">診断結果 — CHART HR Analysis</div>
+  <div class="result-name" id="result-name-display"></div>
+  <div class="result-meta" id="result-meta-display"></div>
+</div>
+
+<div class="result-section">
+  <div class="section-label">Personality Type</div>
+  <div class="section-title">MBTIタイプ推定</div>
+  <div class="mbti-type" id="mbti-type-display"></div>
+  <div class="mbti-name" id="mbti-name-display"></div>
+  <div class="mbti-axes" id="mbti-axes-display"></div>
+</div>
+
+<div class="result-section">
+  <div class="section-label">Cognitive & Emotional Profile</div>
+  <div class="section-title">IQ・EQ推定</div>
+  <div class="score-grid">
+    <div class="score-card">
+      <div class="score-card-label">IQ推定スコア</div>
+      <div class="score-value" id="iq-value"></div>
+      <div class="score-range" id="iq-range"></div>
+      <div class="score-desc" id="iq-desc"></div>
+      <div id="iq-note" style="display:none;margin-top:10px;font-size:11px;color:#d4aa50;padding:8px 10px;background:rgba(184,134,11,0.08);border-left:2px solid #b8860b;line-height:1.6;"></div>
+    </div>
+    <div class="score-card">
+      <div class="score-card-label">EQ総合スコア</div>
+      <div class="score-value" id="eq-total-value"></div>
+      <div class="score-range">感情知性指数（100点満点）</div>
+      <div class="score-desc" id="eq-total-desc"></div>
+    </div>
+  </div>
+  <div class="eq-grid" id="eq-axes-display"></div>
+</div>
+
+<div class="result-section">
+  <div class="section-label">Aptitude Analysis</div>
+  <div class="section-title">部署適性スコア</div>
+  <div class="dept-grid" id="dept-scores-display"></div>
+  <div class="potential-depts" id="potential-depts-display"></div>
+  <!-- 総合企業戦略適性（部署適性とは別の総合指標） -->
+  <div style="margin-top:24px;padding:20px 22px;background:#0d0d0d;border:1px solid #c79a3a;border-radius:4px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;right:0;bottom:0;width:120px;background:linear-gradient(90deg,transparent,rgba(212,170,80,0.08));pointer-events:none;"></div>
+    <div style="font-size:10px;letter-spacing:3px;color:#d4aa50;text-transform:uppercase;margin-bottom:6px;">CORPORATE STRATEGY APTITUDE</div>
+    <div style="font-size:15px;font-weight:700;color:#ffffff;margin-bottom:14px;">総合企業戦略適性</div>
+    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;">
+      <div id="strategy-score" style="font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;color:#d4aa50;letter-spacing:2px;">--</div>
+      <div style="font-family:'DM Mono',monospace;font-size:13px;color:#888;">/ 120</div>
+      <div id="strategy-rank" style="font-family:'DM Mono',monospace;font-size:11px;color:#d4aa50;letter-spacing:2px;margin-left:auto;"></div>
+    </div>
+    <div style="height:5px;background:#222;border-radius:2px;overflow:hidden;margin-bottom:14px;">
+      <div id="strategy-bar" style="height:100%;background:linear-gradient(90deg,#c79a3a,#f0cc70);width:0%;transition:width .6s ease;"></div>
+    </div>
+    <div style="font-size:11px;color:#aaaaaa;line-height:1.7;">※ 全部署適性や選択肢から見た、総合的な企業戦略適性数値です。<br>論理思考・システム化能力・抽象思考・経営判断・自己客観視・高IQ補正の総合から算出。経営企画・戦略立案・全社視点での適性を示します。</div>
+  </div>
+</div>
+
+<div class="result-section">
+  <div class="section-label">Behavioral Analysis</div>
+  <div class="section-title">強み・弱み・行動傾向</div>
+  <div style="margin-bottom:18px">
+    <div class="section-label" style="margin-bottom:10px">強み</div>
+    <div class="tag-list" id="strengths-display"></div>
+  </div>
+  <div style="margin-bottom:24px">
+    <div class="section-label" style="margin-bottom:10px">弱み・盲点</div>
+    <div class="tag-list" id="weaknesses-display"></div>
+  </div>
+  <div class="section-label" style="margin-bottom:10px">職場での行動傾向</div>
+  <div class="text-block" id="behavior-display"></div>
+</div>
+
+<div style="margin:8px 0;background:#0d2b1a;border-top:2px solid #2ecc71;border-bottom:2px solid #2ecc71;padding:18px 24px;display:flex;align-items:center;gap:14px;"><div style="background:#2ecc71;color:#000;font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:2px;padding:3px 8px;white-space:nowrap;flex-shrink:0;">CHART 運営</div><div><div style="font-size:13px;font-weight:700;color:#2ecc71;margin-bottom:4px;">自己分析は進みましたか？☺️</div><div style="font-size:12px;color:#aaa;line-height:1.8;">最後まで面白い結果が出ています。コピー画面まで読み進めてください！</div><div style="text-align:center;color:#2ecc71;font-size:16px;letter-spacing:10px;margin-top:8px;white-space:nowrap;overflow:hidden;">↓ ↓ ↓ ↓ ↓</div></div></div>
+
+<div class="result-section">
+  <div class="section-label">Motivation & Meaning</div>
+  <div class="section-title">潜在欲求とCHARTでの意味</div>
+  <div class="motive-card"><h4>潜在欲求</h4><p id="motive-core-display"></p></div>
+  <div class="motive-card"><h4>CHARTでその欲求を満たせるキャリアルート</h4><p id="motive-chart-route-display"></p></div>
+  <div class="motive-card"><h4>今CHARTにいる理由の仮説</h4><p id="motive-why-chart-display"></p></div>
+</div>
+
+<div class="result-section">
+  <div class="section-label">Next Steps</div>
+  <div class="section-title">今後の推奨行動</div>
+  <div class="action-list" id="actions-display"></div>
+</div>
+
+<div class="result-section">
+  <div class="section-label">Career Roadmap</div>
+  <div class="section-title">キャリアロードマップ</div>
+  <div class="roadmap" id="roadmap-display"></div>
+</div>
+
+<div style="margin:8px 0;background:#0d2b1a;border-top:2px solid #2ecc71;border-bottom:2px solid #2ecc71;padding:18px 24px;display:flex;align-items:center;gap:14px;"><div style="background:#2ecc71;color:#000;font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:2px;padding:3px 8px;white-space:nowrap;flex-shrink:0;">CHART 運営</div><div><div style="font-size:13px;font-weight:700;color:#2ecc71;margin-bottom:4px;">ここまで読んでくれてありがとうございます！まもなくゴールです！⬇️</div><div style="font-size:12px;color:#aaa;line-height:1.8;">最後のコピーページまでもうすぐ📄 面談前に飯泉に送ってください。</div><div style="text-align:center;color:#2ecc71;font-size:16px;letter-spacing:10px;margin-top:8px;white-space:nowrap;overflow:hidden;">↓ ↓ ↓ ↓ ↓</div></div></div>
+
+<!-- 隠し診断解放バナー -->
+<div id="secret-unlock" style="display:none;margin:24px 0;padding:36px 20px 32px;background:linear-gradient(135deg,#1a0505 0%,#0a0a0a 50%,#1a0505 100%);border:3px solid #ff3030;text-align:center;position:relative;overflow:hidden;border-radius:6px;box-shadow:0 0 40px rgba(255,48,48,0.5),inset 0 0 30px rgba(255,48,48,0.15);animation:emergencyGlow 1.2s ease-in-out infinite;">
+  <style>
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+    @keyframes emergencyGlow{0%,100%{box-shadow:0 0 40px rgba(255,48,48,0.5),inset 0 0 30px rgba(255,48,48,0.15)}50%{box-shadow:0 0 70px rgba(255,48,48,0.9),inset 0 0 50px rgba(255,48,48,0.3)}}
+    @keyframes siren{0%,100%{color:#ff3030;text-shadow:0 0 20px #ff3030}50%{color:#ffaa00;text-shadow:0 0 20px #ffaa00}}
+    @keyframes scroll-bg{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+    @keyframes redLine{0%,100%{background:#ff3030}50%{background:#ffaa00}}
+  </style>
+  <div style="position:absolute;top:0;left:0;right:0;height:6px;background:#ff3030;animation:redLine 0.6s linear infinite;"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:6px;background:#ff3030;animation:redLine 0.6s linear infinite;"></div>
+  <div style="font-size:36px;animation:blink 0.8s ease-in-out infinite;margin-bottom:4px;letter-spacing:8px;">🚨 🚨 🚨</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:4px;font-weight:900;margin-bottom:6px;line-height:1.1;animation:siren 1s ease-in-out infinite;">緊急クエスト発生</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:#ff8080;letter-spacing:3px;margin-bottom:18px;font-weight:700;">⚠ EMERGENCY MISSION UNLOCKED ⚠</div>
+  <div style="font-size:13px;color:#e8e8e8;line-height:1.9;margin-bottom:22px;max-width:440px;margin-left:auto;margin-right:auto;">あなたの診断スコアが<span style="color:#ff5050;font-weight:900;">上位基準を突破</span>しました。<br>エリア統括以上を経た先の<span style="color:#ff5050;font-weight:900;">最高職適性診断</span>が解放されます。<br><span style="font-size:11px;color:#aaa;">追加5問 / 上位約10%のみ表示 / 将来的な適性推定</span></div>
+  <button onclick="startSecretDiagnosis()" style="background:linear-gradient(135deg,#ff3030,#ff5050);color:#fff;border:2px solid #ffaa00;padding:18px 44px;font-family:'Noto Sans JP',sans-serif;font-size:15px;font-weight:900;letter-spacing:3px;cursor:pointer;animation:pulse 1.2s ease-in-out infinite;border-radius:4px;box-shadow:0 4px 20px rgba(255,48,48,0.6);">🚨 今すぐ挑戦する →</button>
+</div>
+
+<!-- 隠し診断 問題エリア -->
+<div class="result-section" id="secret-q-area" style="display:none;">
+  <div class="section-label">Advanced Diagnosis</div>
+  <div class="section-title">最高職適性診断</div>
+  <div id="secret-question-area"></div>
+</div>
+
+<!-- 隠し診断 結果エリア -->
+<div class="result-section" id="secret-result-area" style="display:none;">
+  <div class="section-label">Executive Potential</div>
+  <div class="section-title">最高職適性結果</div>
+  <div style="font-size:12px;color:#555;margin-bottom:20px;padding:10px 14px;border-left:2px solid #ccc;line-height:1.75;">※ これはエリア統括以上の実績を経た先の、将来的な適性推定です。現時点の評価ではありません。</div>
+  <div id="secret-result-display"></div>
+</div>
+
+<div class="result-section">
+  <div class="section-label">For HR Interview</div>
+  <div class="section-title">面談での深掘り推奨質問</div>
+  <div class="interview-list" id="interview-qs-display"></div>
+</div>
+
+<!-- 回答一覧 -->
+<div class="result-section">
+  <div class="section-label">Your Answers</div>
+  <div class="section-title">あなたの回答一覧</div>
+  <div id="answers-display" style="display:flex;flex-direction:column;gap:8px;"></div>
+</div>
+
+<div class="share-section" style="padding:0;margin-top:0;">
+  <div style="background:#111;padding:32px 24px 24px;text-align:center;border-top:3px solid #2ecc71;">
+    <div style="font-size:9px;letter-spacing:4px;color:#2ecc71;text-transform:uppercase;margin-bottom:10px;">🎉 Diagnosis Complete</div>
+    <div style="font-family:'Noto Sans JP',sans-serif;font-size:26px;font-weight:900;color:#fff;margin-bottom:8px;">診断が完了しました</div>
+    <div style="font-size:13px;color:#aaa;line-height:1.9;">この結果を人事部 飯泉に送ることで、<br>面談の準備が完了します。</div>
+  </div>
+  <div style="background:#0d2b1a;border-left:2px solid #2ecc71;border-right:2px solid #2ecc71;border-bottom:2px solid #2ecc71;padding:28px 24px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <div style="background:#2ecc71;color:#0a0a0a;font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:2px;padding:3px 8px;flex-shrink:0;">STEP 1</div>
+      <div style="font-size:13px;font-weight:700;color:#2ecc71;">まずLINE WORKSで飯泉を友達追加</div>
+    </div>
+    <div style="font-size:11px;color:#888;margin-bottom:14px;">まだ繋がっていない方は先にこちらから追加してください</div>
+    <a href="https://works.do/5jql0MO" target="_blank" style="display:block;padding:14px 20px;background:#06c755;color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;text-decoration:none;letter-spacing:1px;text-align:center;margin-bottom:24px;">➕ 人事部 飯泉のLINE WORKSを追加する</a>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <div style="background:#2ecc71;color:#0a0a0a;font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:2px;padding:3px 8px;flex-shrink:0;">STEP 2</div>
+      <div style="font-size:13px;font-weight:700;color:#2ecc71;">診断結果をコピーして送信</div>
+    </div>
+    <div style="font-size:11px;color:#888;margin-bottom:14px;">コピー後、LINE WORKSのトークに貼り付けて送信してください</div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="copyResult()" style="flex:1;padding:14px 12px;background:#fff;color:#111;border:2px solid #2ecc71;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:1px;">📋 結果をコピー</button>
+      <button onclick="sendLineWorks()" style="flex:1;padding:14px 12px;background:#06c755;color:#fff;border:none;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:1px;">💬 LINE WORKSを開く</button>
+    </div>
+    <div id="copy-success" style="display:none;font-size:12px;color:#2ecc71;margin-top:10px;letter-spacing:1px;text-align:center;">✓ コピーしました！LINE WORKSに貼り付けて送信してください</div>
+  </div>
+  <div style="background:#f0faf4;border:1px solid #b7e4c7;padding:28px 24px;text-align:center;">
+    <div style="font-size:22px;margin-bottom:10px;">🤝</div>
+    <div style="font-size:14px;font-weight:700;color:#1a5c35;margin-bottom:8px;">送信完了で、面談のご連絡をお待ちしています</div>
+    <div style="font-size:12px;color:#555;line-height:1.9;margin-bottom:20px;">人事部 飯泉が結果を確認の上、面談日程を調整します。</div>
+    <div style="padding:14px 20px;background:#fff;border:1px solid #b7e4c7;display:inline-block;">
+      <div style="font-size:10px;letter-spacing:2px;color:#2ecc71;font-weight:700;margin-bottom:4px;">CHART 人事部より</div>
+      <div style="font-size:14px;color:#1a5c35;font-weight:700;line-height:1.7;">人事部と共に、あなたのキャリアを描こう。</div>
+    </div>
+  </div>
+  <div id="copy-preview-wrap" style="display:none;padding:20px 24px 40px;">
+    <div style="font-size:9px;letter-spacing:3px;color:#888;text-transform:uppercase;margin-bottom:10px;color:#555 !important;">テキストコピー内容プレビュー</div>
+    <div id="copy-preview-box" style="background:#f9f9f9;border:1px solid #ddd;padding:16px;font-size:11px;color:#222;line-height:1.8;white-space:pre-wrap;font-family:'DM Mono',monospace;max-height:300px;overflow-y:auto;"></div>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+<script>
+const questions = [
+  {id:1,section:'仕事スタイル',text:'新しい仕事や環境に入ったとき、あなたはどちらに近いですか？',options:['全体の仕組みや構造を先に理解しようとする','まず動きながら覚えていく','指示された範囲をしっかりこなすことを優先する','周りの人を観察して、空気を読みながら合わせる'],scores:[{E:-1,I:1,N:1,S:-1,logic:3,sys:3},{E:1,I:-1,S:1,N:-1},{E:-1,I:1,S:2,N:-2},{E:1,I:-1,S:1,N:-1,collab:1}]},
+  {id:2,section:'仕事スタイル',text:'仕事のやりがいを感じるのはどんなときですか？',options:['自分のスキルや成果が目に見えて上がったとき','チームや顧客に感謝・喜ばれたとき','任された仕事を完璧に仕上げたとき','新しいアイデアや仕組みを形にできたとき'],scores:[{T:2,F:-2,J:1,growth:3,ach:2},{T:-1,F:2,meaning:2,trainer:2},{T:0,F:0,J:2,ach:2},{T:1,N:1,growth:2,creative:2}]},
+  {id:3,section:'仕事スタイル',text:'複数の仕事が重なったとき、どう対処しますか？',options:['優先順位を整理してリスト化する','重要そうなものから感覚で片付ける','誰かに相談または分担する','締め切りが来たものから順番にこなす'],scores:[{J:2,logic:2,sys:2},{J:-1,P:1},{collab:2},{J:1}]},
+  {id:4,section:'仕事スタイル',text:'苦手な業務に直面したとき、あなたはどうしますか？',options:['克服するまで向き合う','得意な人に任せて自分は別で貢献する','なぜ苦手なのか分析してから対処する','とりあえずやってみて感覚でつかむ'],scores:[{persist:3,J:1},{collab:2},{T:2,logic:3},{S:1,persist:1}]},
+  {id:5,section:'仕事スタイル',text:'1週間後に重要なプレゼンがある。どう準備しますか？',options:['スケジュールを逆算してタスク分解する','前日に集中して仕上げる','資料より話の流れを練ることを優先する','上司や先輩にアドバイスをもらいながら進める'],scores:[{J:2,logic:2,sys:2},{J:-2,P:2},{N:1,logic:1},{collab:2,E:1}]},
+  {id:6,section:'人間関係',text:'職場での人間関係において、最も大切だと思うことは？',options:['信頼できる少数の人間関係','広い人脈と良好な関係性','明確なルールと公平性','共感し合える雰囲気'],scores:[{I:2,E:-2,J:1},{E:2,I:-2},{T:2,F:-2,J:1},{F:2,T:-2,trainer:1}]},
+  {id:7,section:'人間関係',text:'同僚が明らかにミスをしているとき、あなたはどうしますか？',options:['その場で指摘する','後でこっそり伝える','ミスの原因を一緒に考える','見守りつつ必要なら助ける'],scores:[{T:2,E:1},{T:1,I:1},{T:1,F:1,collab:2},{F:2,collab:1,trainer:1}]},
+  {id:8,section:'人間関係',text:'チームで意見が割れた場合、あなたはどう動きますか？',options:['データや根拠を示して自分の意見を通す','全員の意見をまとめる方向を探る','リーダーや権限者の判断に従う','場の雰囲気を読んで柔軟に対応する'],scores:[{T:3,logic:2,mgmt:1},{collab:3,F:1,mgmt:2},{J:1},{S:1,collab:2}]},
+  {id:9,section:'人間関係',text:'後輩や部下の指導でやりがいを感じるのはどんなとき？',options:['成長が数字や結果で見えたとき','信頼関係ができてきたと感じたとき','自分のノウハウをうまく伝えられたとき','本人が自分で考えて動けるようになったとき'],scores:[{T:2,trainer:2,mgmt:2},{F:2,trainer:1,meaning:2},{trainer:3,T:1},{N:2,mgmt:3,trainer:2}]},
+  {id:10,section:'人間関係',text:'初対面の人と話すとき、あなたはどちらに近いですか？',options:['積極的に話しかけて仲良くなる','相手が話しかけてきたら応じる','相手の様子を観察してから関わる','共通の話題があれば自分から入る'],scores:[{E:3,I:-2},{E:-1,I:2},{I:2,E:-1},{E:1,I:-1}]},
+  {id:11,section:'価値観',text:'仕事を続ける上で、最も外せないものはどれですか？',options:['成長・スキルアップ','収入・待遇','やりがい・意義感','安定・環境の良さ'],scores:[{growth:4,ach:2},{ach:3,stable:1},{meaning:4,growth:1},{stable:4,meaning:1}]},
+  {id:12,section:'価値観',text:'「いい仕事をした」と思えるのはどんなときですか？',options:['目標や数値を達成したとき','誰かの役に立てたと実感したとき','自分の限界を超えられたとき','計画通りに進められたとき'],scores:[{ach:3,T:1},{meaning:3,F:2,trainer:1},{growth:3,persist:2},{J:3,ach:1}]},
+  {id:13,section:'価値観',text:'10年後、どんな自分でいたいですか？',options:['専門性を極めたプロフェッショナル','チームや組織をまとめるリーダー','自分のビジネスや裁量で動く人','人の成長を支える育成者'],scores:[{specialist:4,trainer:3},{mgmt:4,leader:3},{independence:4,autonomy:3},{trainer:4,meaning:3,mgmt:1}]},
+  {id:14,section:'価値観',text:'仕事でストレスを感じるのはどんなときですか？',options:['自分の意見が通らないとき','結果が出ないと感じるとき','人間関係がうまくいかないとき','やることが多すぎて整理できないとき'],scores:[{autonomy:3,T:1},{ach:0,w_ach:2},{w_rel:3,F:1},{J:2,sys:1,w_chaos:2}]},
+  {id:15,section:'価値観',text:'理想の職場環境はどちらに近いですか？',options:['裁量が大きく自分で決められる環境','明確なルールと評価基準がある環境','仲間と助け合える温かい環境','挑戦や変化が多い環境'],scores:[{autonomy:4,independence:2},{J:3,stable:2},{collab:3,F:2,meaning:2},{growth:3,N:2,P:1}]},
+  {id:16,section:'行動パターン',text:'新しいことを始めるとき、どちらに近いですか？',options:['計画を立ててから動く','とりあえず動いてみる','情報収集を十分してから判断する','誰かと一緒に始める'],scores:[{J:2,sys:2},{J:-2,P:2,growth:1},{I:1,logic:2,sys:1},{E:2,collab:2}]},
+  {id:17,section:'行動パターン',text:'失敗したとき、あなたはどうしますか？',options:['原因を分析して次に活かす','気持ちを切り替えてすぐ次に進む','誰かに相談する','しばらく引きずってしまう'],scores:[{T:3,logic:3,growth:2},{P:2,persist:2},{collab:2,E:1},{F:1,I:1,w_emotion:1}]},
+  {id:18,section:'行動パターン',text:'自分の「得意なこと」はどれに近いですか？',options:['物事を論理的に整理・説明すること','人の気持ちや状況を読み取ること','新しいアイデアを生み出すこと','コツコツ丁寧に積み上げること'],scores:[{T:3,logic:3,IQ_bonus:3},{F:3,EQ_bonus:4,trainer:2},{N:3,creative:3},{S:3,J:2,persist:3,specialist:2}]},
+  {id:19,section:'行動パターン',text:'目標に対してどのようにアプローチしますか？',options:['高い目標を設定して全力で取り組む','現実的な目標を確実にこなす','目標より「なぜやるか」を大切にする','状況を見ながら柔軟に調整する'],scores:[{ach:3,growth:2,persist:2},{J:2,stable:2,ach:1},{meaning:3,N:1},{P:2,collab:1}]},
+  {id:20,section:'行動パターン',text:'仕事で評価されたいのはどんな側面ですか？',options:['成果・数字','人間性・信頼感','専門性・スキル','発想力・独自性'],scores:[{ach:3,T:1,mgmt:1},{F:2,meaning:2,trainer:1},{specialist:3,T:1,trainer:2},{N:3,creative:2,independence:1}]},
+  {id:21,section:'自己認識',text:'自分の最大の強みだと思うものはどれですか？',options:['分析力・論理的思考','コミュニケーション・共感力','行動力・突破力','継続力・粘り強さ'],scores:[{T:3,logic:3,IQ_bonus:5},{F:3,E:2,EQ_bonus:5},{E:2,P:1,ach:2},{J:2,S:1,persist:3,specialist:2}]},
+  {id:22,section:'自己認識',text:'自分の課題・弱みだと思うものはどれですか？',options:['細かいことが気になりすぎる','感情に左右されやすい','完璧主義で動き出しが遅い','飽きっぽく継続が苦手'],scores:[{J:1,T:1,w_detail:1},{F:1,w_emotion:1},{J:1,T:1,w_perf:1},{P:1,w_bored:1}]},
+  {id:23,section:'自己認識',text:'自分のことをどのくらい理解できていると思いますか？',options:['かなり深く理解している','ある程度はわかっている','よくわからない部分も多い','他者の方が自分をよく見えていると思う'],scores:[{self_aware:4,IQ_bonus:2},{self_aware:2},{self_aware:1},{self_aware:2,F:1}]},
+  {id:24,section:'自己認識',text:'CHARTで働く中で、最も成長したと感じるのは？',options:['専門的なスキル・知識','コミュニケーション・人間力','仕事の進め方・段取り力','自己管理・メンタルの安定'],scores:[{specialist:2,trainer:2},{F:2,E:1,trainer:2,EQ_bonus:2},{J:2,sys:2,mgmt:1},{stable:2,EQ_bonus:2}]},
+  {id:25,section:'自己認識',text:'今後のCHARTでのキャリアに対して、今の気持ちに近いのは？',options:['明確にやりたいことがある','もっと成長できる環境や機会を求めている','今の仕事を深めていきたい','少し迷いや不安がある'],scores:[{motivation:4,ach:2},{motivation:3,growth:3,risk_mid:1},{motivation:2,stable:3,specialist:2},{motivation:1,risk_high:2}]},
+  {id:26,section:'エネルギー・回復',text:'仕事や人間関係で疲れたとき、エネルギーを回復できるのはどちらですか？',options:['誰かと話したり出かけたりすると元気になる','一人で過ごす時間があると回復できる','楽しい相手となら人と、疲弊してたら一人でいたい','あまり意識したことがない'],scores:[{E:5,I:-3},{I:5,E:-3},{E:0,I:0},{E:0,I:0}]},
+  {id:27,section:'エネルギー・回復',text:'職場や初対面の場で、自分の考えや意見を話すとき、どちらに近いですか？',options:['積極的に自分から発言する・場を引っ張るのが自然','求められたら話す・聞き役になることが多い','相手や状況によって全然変わる','発言するより観察・分析していることが多い'],scores:[{E:5,I:-3},{I:4,E:-2},{E:1,I:0},{I:2,E:0}]},
+  {id:28,section:'自己認識',text:'アイデアや表現方法について、自分にあてはまるのは？',options:['文章・図解・スライドなど、伝え方の「見せ方」を自分で工夫するのが好き','データや論理に説得力を持たせる構成を考えるのが得意','既存のフォーマットをそのまま使う方が効率的だと思う','人の作ったものを改善・編集する方が得意'],scores:[{creative:3,N:1,E:1},{logic:1,sys:1,T:1},{stable:1,J:1},{collab:1,T:1}]},
+  {id:29,section:'行動パターン',text:'チームや組織で結果を出すとき、あなたの主な動き方は？',options:['自分が先頭に立ち、方針を示してチームを引っ張る','全体の仕組みやルールを設計してチームを機能させる','メンバーを支えながら、各自の力を引き出していく','任された範囲で自分の成果を最大化することに集中する'],scores:[{leader:4,mgmt:1,E:1},{mgmt:2,sys:1,J:1},{collab:1,F:1,trainer:1},{autonomy:2,specialist:1,independence:1}]},
+  {id:30,section:'価値観',text:'何かで成果を出した経験を振り返ると、最も活きたのは？',options:['SNS・発信・コンテンツで多くの人に届けた経験','1対1で深く向き合って信頼を勝ち取った経験','数字を分析して施策を改善し続けた経験','チームをまとめて目標を達成した経験'],scores:[{creative:2,E:1,N:1},{trainer:2,F:1,collab:1},{logic:1,sys:1,T:1},{mgmt:1,leader:1,J:1}]}
+];
+
+let answers={}, currentQ=0, userName='', userGender='', userAge=0;
+
+function startDiagnosis(){
+  userName=document.getElementById('input-name').value.trim();
+  userGender=document.getElementById('input-gender').value;
+  userAge=parseInt(document.getElementById('input-age').value)||25;
+  if(!userName){alert('フルネームを入力してください');return;}
+  if(!userGender){alert('性別を選択してください');return;}
+  showScreen('screen-questions');
+  renderQuestion(0);
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  try{window.scrollTo(0,0);}catch(e){}
+}
+
+function renderQuestion(idx){
+  const q=questions[idx];
+  var optsHtml='';
+  q.options.forEach(function(opt,i){
+    var sel=answers[q.id]===i?' selected':'';
+    optsHtml+='<div class="option'+sel+'" onclick="selectAndAdvance('+q.id+','+i+','+idx+')">'
+      +'<span class="option-key">'+String.fromCharCode(65+i)+'</span>'
+      +'<span class="option-text">'+opt+'</span></div>';
+  });
+  var backBtn=idx>0?'<button class="btn btn-outline" onclick="goBack()">← 前へ</button>':'';
+  document.getElementById('question-area').innerHTML=
+    '<div class="question-block active">'
+    +'<div class="q-wrap">'
+    +'<div class="q-section">'+q.section+'</div>'
+    +'<div class="q-number">'+String(idx+1).padStart(2,'0')+'</div>'
+    +'<div class="q-text">'+q.text+'</div>'
+    +'</div>'
+    +'<div class="options">'+optsHtml+'</div>'
+    +'<div class="nav-buttons">'+backBtn+'</div>'
+    +'</div>';
+  document.getElementById('progress-fill').style.width=Math.round(((idx+1)/questions.length)*100)+'%';
+  document.getElementById('progress-label').textContent=`Q${idx+1} / ${questions.length}`;
+}
+
+function selectAnswer(qId,optIdx){answers[qId]=optIdx;renderQuestion(currentQ);}
+function selectAndAdvance(qId,optIdx,idx){
+  answers[qId]=optIdx;
+  document.querySelectorAll('.option').forEach(function(el,i){el.classList.toggle('selected',i===optIdx);});
+  setTimeout(function(){
+    if(idx<questions.length-1){currentQ++;renderQuestion(currentQ);}
+    else{showLoading();}
+  },300);
+}
+function goNext(){if(currentQ<26){currentQ++;renderQuestion(currentQ);}else{showLoading();}}
+function goBack(){if(currentQ>0){currentQ--;renderQuestion(currentQ);}}
+
+const loadingMsgs=['回答パターンを分析中...','特性プロファイルを生成中...','部署適性を算出中...','キャリアマッチングを処理中...','レポートを構築中...'];
+function showLoading(){
+  showScreen('screen-loading');
+  let i=0;
+  const iv=setInterval(()=>{
+    document.getElementById('loading-text').textContent=loadingMsgs[i%loadingMsgs.length];
+    i++;
+    if(i>loadingMsgs.length){clearInterval(iv);computeResult();}
+  },700);
+}
+
+function computeResult(){
+  const tr={E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0,logic:0,sys:0,collab:0,growth:0,ach:0,stable:0,meaning:0,autonomy:0,persist:0,trainer:0,mgmt:0,specialist:0,creative:0,independence:0,leader:0,IQ_bonus:0,EQ_bonus:0,self_aware:0,motivation:0,risk_high:0,risk_mid:0,w_detail:0,w_emotion:0,w_perf:0,w_bored:0,w_ach:0,w_rel:0,w_chaos:0};
+  questions.forEach(q=>{
+    const sel=answers[q.id];
+    if(sel===undefined)return;
+    Object.keys(q.scores[sel]).forEach(k=>{tr[k]=(tr[k]||0)+q.scores[sel][k];});
+  });
+
+  // MBTI
+  const mbtiType=(tr.E>=tr.I?'E':'I')+(tr.S>=tr.N?'S':'N')+(tr.T>=tr.F?'T':'F')+(tr.J>=tr.P?'J':'P');
+  // 経営者級ボーナス（mgmt>=8 && leader>=3 && logic>=15 / 一般人の0.09%のみ該当・飯泉のような上位者専用）
+  const execBonus=(tr.mgmt>=8&&tr.leader>=3&&tr.logic>=15)?20:0;
+  // 万能型ボーナス（経営者級該当者＝飯泉のような全方位型）
+  const isOmni=execBonus>0;
+  const omniTrainer=isOmni?38:0;  // 現場トレーナーに+38（入会率高い経営者は現場もできる）
+  const omniDept=isOmni?-5:0;     // 人事・運営・マーケから-5（盛り過ぎ補正）
+  const iqCap=isOmni?135:140;     // 万能型はIQ上限135（145→135）
+  const iqLow=isOmni?125:50;      // 万能型は最低125保証
+  const mbtiNames={ENTJ:'指揮官 — 戦略家型リーダー',ENTP:'討論者 — 革新的挑戦者',ENFJ:'主人公 — 人を動かすカリスマ',ENFP:'運動家 — 情熱的な理想主義者',INTJ:'建築家 — 戦略的思考の完璧主義者',INTP:'論理学者 — 独創的な分析家',INFJ:'提唱者 — 誠実なビジョナリー',INFP:'仲介者 — 理想主義的な調停者',ESTJ:'幹部 — 秩序を重んじるマネージャー',ESTP:'起業家 — 行動的なリアリスト',ESFJ:'領事 — 思いやりのある協調者',ESFP:'エンターテイナー — 場を盛り上げる存在',ISTJ:'管理者 — 誠実な実行者',ISTP:'巨匠 — 冷静な問題解決者',ISFJ:'擁護者 — 献身的なサポーター',ISFP:'冒険者 — 柔軟な芸術家気質'};
+  const mbtiAxes=[
+    {l:'I（内向）',r:'E（外向）',pct:Math.min(95,Math.max(5,50+tr.E*9))},
+    {l:'S（感覚）',r:'N（直観）',pct:Math.min(95,Math.max(5,50+tr.N*8))},
+    {l:'F（感情）',r:'T（思考）',pct:Math.min(95,Math.max(5,50+tr.T*8))},
+    {l:'P（知覚）',r:'J（判断）',pct:Math.min(95,Math.max(5,50+tr.J*8))}
+  ];
+
+  // IQ
+  const iqRaw=Math.min(iqCap,Math.max(iqLow,Math.round(69+tr.logic*3.2+tr.sys*2+tr.IQ_bonus*2.5+(tr.creative||0)*1.5+(tr.self_aware>2?4:0))));
+  const iqDisplay=iqRaw;
+  const iqLevel=iqRaw>=115?'high':iqRaw>=95?'mid':'low';
+  const iqMsgs={
+    high:{range:'115〜140',desc:'抽象的な概念の処理や複雑なパターンの認識が速い。情報の構造化・言語化能力が高く、戦略立案・研修設計・マネジメントなど「考える仕事」で本領を発揮しやすいタイプです。'},
+    mid:{range:'95〜114',desc:'論理的な整合性を重視しながら現実的な判断ができるバランス型。実務での問題解決能力が高く、経験を体系化してチームに展開する役割に向いています。'},
+    low:{range:'50〜94',desc:'知識の積み上げと実践の反復を通じて着実に力をつけるタイプ。コツコツと積み上げる力と現場での実行力が強みです。'}
+  };
+
+  // EQ
+  const eqAxes=[
+    {name:'自己認識',score:Math.max(30,Math.min(100,Math.round(49+tr.self_aware*9+(tr.T>2?4:0)+(tr.logic>=3?3:0)))),desc:'自分の感情・強み・弱みを正確に把握する力。高いほど行動に一貫性が出る。'},
+    {name:'共感力',score:Math.max(30,Math.min(100,Math.round(45+tr.F*1.8+tr.collab*1.3+tr.EQ_bonus*1+(tr.mgmt>=2?4:0)+(tr.meaning>=3?3:0)+(tr.self_aware>=3?4:0)+execBonus))),desc:'他者の感情や状況を読み取り、適切に応答する力。チームワークや顧客対応の質に直結する。'},
+    {name:'感情制御',score:Math.max(30,Math.min(100,Math.round(51+tr.J*2.2+tr.persist*2+(tr.self_aware>=3?4:0)-(tr.w_emotion||0)*5))),desc:'ストレス下や葛藤場面で感情に流されず、冷静に行動を選択できる力。'},
+    {name:'対人影響力',score:Math.max(30,Math.min(100,Math.round(49+tr.E*2+tr.leader*3+tr.mgmt*1.5+tr.trainer*1))),desc:'言動を通じて周囲を動かし、チームや顧客の行動変容を促す力。リーダーシップの根幹。'}
+  ];
+  const eqTotal=Math.round(eqAxes.reduce((a,b)=>a+b.score,0)/4);
+  const eqTotalDesc=eqTotal>=75?'感情知性が全体的に高く、自己認識と対人関係の両面でバランスの取れたプロファイルです。':eqTotal>=55?'特定の軸に強みを持ちながら、バランスを整えることでさらに対人力が伸びるポジションです。':'感情面での内省や他者理解を深める経験を積むことで、大きく伸びしろがあるステージです。';
+
+  // ===== DEPARTMENT SCORES =====
+  // 現場トレーナーを基本軸に設計
+  const trainerBase=Math.max(30,Math.min(118,Math.round(43+tr.trainer*2.3+tr.F*1+tr.persist*1.3+(tr.specialist>2?5:0)+tr.EQ_bonus*1+omniTrainer)));
+  const opsBase=Math.max(30,Math.min(118,Math.round(45+tr.sys*2.5+tr.J*1.3+tr.collab*1.1+tr.mgmt*1.3+omniDept)));
+  const hrBase=Math.max(30,Math.min(118,Math.round(43+tr.collab*1.8+tr.F*1.2+tr.self_aware*3+tr.mgmt*1.8+(tr.meaning>3?5:0)+execBonus+omniDept)));
+  const mktBase=Math.max(30,Math.min(120,Math.round(48+tr.creative*2.5+tr.N*2+tr.E*0.8+tr.logic*0.8+execBonus+omniDept)));
+  // 企業戦略部スコア（経営層・戦略立案・全社視点）
+  const strategyBase=Math.max(30,Math.min(120,Math.round(43+tr.logic*1.5+tr.sys*1.3+tr.N*1.1+tr.mgmt*0.8+tr.self_aware*1.2+tr.IQ_bonus*1.1)));
+  const depts=[
+    {name:'現場トレーナー',score:trainerBase,over:trainerBase>100},
+    {name:'店舗運営部',score:opsBase,over:opsBase>100},
+    {name:'人事部',score:hrBase,over:hrBase>100},
+    {name:'マーケティング部',score:mktBase,over:mktBase>100}
+  ];
+
+  // 潜在部署（高適性者のみ）
+  const potentialDepts=[];
+  if(tr.creative>=3||tr.N>=4) potentialDepts.push('SNS・広報部');
+  if(tr.J>=4&&tr.sys>=3) potentialDepts.push('経理・総務部');
+  if(tr.E>=3&&tr.ach>=4) potentialDepts.push('営業部');
+  if(tr.logic>=4&&tr.self_aware>=3) potentialDepts.push('コンサル・コーチング部');
+  if(tr.sys>=4&&tr.mgmt>=3&&tr.leader>=2) potentialDepts.push('企業戦略・企画部');
+
+  // ===== キャリアパス判定 =====
+  // 内部・マネジメント系は高スコアのみ
+  const isInternalCandidate=(hrBase>=90||opsBase>=90)&&(tr.mgmt>=4||tr.sys>=4||tr.logic>=3);
+  const isEliteCandidate=isInternalCandidate&&(tr.leader>=3||tr.autonomy>=3)&&iqRaw>=112;
+  const isFieldElite=(tr.trainer>=3||tr.persist>=3||(eqTotal>=70&&tr.meaning>=3));
+  const is4thStage=iqRaw>=118&&(tr.mgmt>=3||tr.leader>=2||tr.autonomy>=3)&&(tr.sys>=3||tr.logic>=3)&&tr.self_aware>=2;
+
+  // ===== STRENGTHS & WEAKNESSES =====
+  const allStr=[];
+  if(tr.logic>=3)allStr.push('論理的思考力');
+  if(tr.sys>=3)allStr.push('体系化・仕組み化');
+  if(tr.collab>=3)allStr.push('チームワーク');
+  if(tr.F>=2)allStr.push('共感・傾聴力');
+  if(tr.E>=3)allStr.push('コミュニケーション力');
+  if(tr.persist>=2)allStr.push('粘り強さ');
+  if(tr.growth>=3)allStr.push('成長への意欲');
+  if(tr.ach>=3)allStr.push('目標達成力');
+  if(tr.creative>=2)allStr.push('発想力');
+  if(tr.meaning>=3)allStr.push('仕事への意義感');
+  if(tr.self_aware>=3)allStr.push('自己認識の深さ');
+  if(tr.trainer>=3)allStr.push('育成・指導力');
+  if(allStr.length===0)allStr.push('実行力','誠実さ','適応力');
+  const strengths=allStr.slice(0,5);
+
+  const wks=[];
+  if(tr.w_detail>=1)wks.push('細部へのこだわりすぎ');
+  if(tr.w_emotion>=1)wks.push('感情の波が出やすい');
+  if(tr.w_perf>=1)wks.push('完璧主義による着手の遅さ');
+  if(tr.w_bored>=1)wks.push('ルーティン業務への飽き');
+  if(wks.length===0)wks.push('優先度の調整','状況への過度な適応');
+  const weaknesses=wks.slice(0,3);
+
+  const behaviorTexts16={
+    ENTJ:'目標への逆算思考が強く、チームや環境を巻き込んで結果を出すことを得意とする。感情よりロジックで動き、長期視点と実行力の両立が強み。組織の方向性を定める役割で本領を発揮する。',
+    INTJ:'独立した思考と長期的な戦略設計が強み。システムの全体像を把握し、非効率を排除する能力が高い。少人数の信頼関係を深める形で影響力を発揮する。',
+    ENTP:'発想と議論を通じて可能性を広げるタイプ。既存の枠組みに疑問を持ち、新しい切り口でアプローチする。仕組みづくりや改善提案に向いている。',
+    INTP:'構造と原理の理解に集中し、独自の視点で問題を解析する。一度理解すると圧倒的な質でアウトプットできる。',
+    ENFJ:'人を動かすことに長け、チームの雰囲気と方向性を自然に整える。共感ベースのリーダーシップが強みで、育成・相談に向いている。',
+    INFJ:'長期的なビジョンと人への深い洞察が強み。影響力を静かに行使するタイプで、質の高い育成や制度設計に向いている。',
+    ENFP:'可能性と人への関心を原動力にするタイプ。アイデアと感情の両方を持ち、新しい取り組みや人を巻き込む仕事で輝く。',
+    INFP:'価値観ベースで動き、意義を感じる仕事に深くコミットする。縁の下での貢献・育成・相談役として信頼される。',
+    ESTJ:'明確なルールと秩序のもとで最大のパフォーマンスを発揮する。計画実行力と責任感が高く、チームの管理・運営に向いている。',
+    ISTJ:'計画通りに着実に進める力と高い責任感が強み。細部への注意力と完遂力があり、長期的な信頼関係を築くタイプ。',
+    ESTP:'即断即決でスピード感があり、現場での問題解決が得意。変化に強く、ルールより結果を重視する。',
+    ISTP:'冷静な問題解決者。感情に流されず、現実的かつ効率的に課題に対処する。専門性を深めることでさらに力を発揮する。',
+    ESFJ:'チームの調和と協力を重視し、周囲への気配りで場を支える。顧客対応・育成・日常管理など人と関わる実務で強みが出るタイプ。組織の人間関係を円滑にする潤滑油的な存在。',
+    ISFJ:'誠実で丁寧な仕事ぶりが信頼を生む。縁の下の力持ちとして機能しやすく、継続性・安定感・細部への配慮が強み。',
+    ESFP:'場の雰囲気を明るくし、人との関係を築くのが得意。現場での即興対応力と顧客への親しみやすさが武器。',
+    ISFP:'柔軟で適応力が高く、プレッシャーの少ない環境で丁寧な仕事をする。感性と誠実さを軸に、独自の貢献スタイルを持つ。'
+  };
+  const behavior=behaviorTexts16[mbtiType]||(mbtiType+'タイプとして、自分の強みを活かした働き方ができるポテンシャルを持っています。現場での経験値を体系化し、組織に還元する力が育ちつつある段階です。');
+
+  // MOTIVATION
+  const topMotive=tr.growth>=tr.ach&&tr.growth>=tr.meaning&&tr.growth>=tr.stable?'growth':tr.ach>=tr.meaning&&tr.ach>=tr.stable?'ach':tr.meaning>=tr.stable?'meaning':'stable';
+  const motives={
+    growth:{core:'「成長欲求」が最も強い根底の動機。現状に留まることへの違和感と、より高いステージへ行きたいという衝動が行動を生み出している。「昨日の自分を超えているか」が自己評価の基準になりやすい。',route:'CHARTでは未経験領域への挑戦や、スタッフ育成のリーダー役など「成長の密度が高い仕事」が継続的に欲求を満たす。現場での実績を積みながら、徐々に影響力の範囲を広げていくことが重要。',why:'CHARTはトレーニング・接客・人材育成が一体化した、現場で学べることが圧倒的に多い環境。「今ここで学んでおく価値がある」という判断が無意識に働いている。'},
+    ach:{core:'「達成欲求」が中心にある。目標をクリアすることで自己価値を確認するサイクルで動く。数字・結果・評価が見える環境で力を発揮しやすく、曖昧なゴールが最もストレスになる。',route:'CHARTでは顧客の変化・担当件数・リピート率など、現場で見える成果を持ちながら働くことが最も欲求を満たす。短期で結果が出る現場環境は達成型にとって恵まれた場所。',why:'努力が結果として見えやすいCHARTの現場環境が、達成型の人間に継続的な充実感を提供している。「ここで頑張れば手応えが返ってくる」という実感がCHARTに留まる理由。'},
+    meaning:{core:'「意味・意義欲求」が根底にある。「なぜやるか」が明確でないと力が出ない。人や社会への貢献、信念との一致が行動の燃料になる。',route:'CHARTでは「人の身体と人生を変える」という仕事の意義が日常業務に直結している。担当顧客の変化や成長を直接見られる現場という環境が、意義型の人間のモチベーション源になりやすい。',why:'商業主義だけでないCHARTのサービス哲学と、意義型の人間の価値観が一致している。「お金だけのために働く」ことへの違和感があり、CHARTの現場はその答え合わせができる場所。'},
+    stable:{core:'「安定・安心欲求」が現在の行動の軸になっている。「今あるものを守りながら、少しずつ良くしたい」という感覚が根底にある。',route:'CHARTでは長期就業者としての専門性向上と、チームの中核を担う役割が安定欲求を満たす。チーフや先輩トレーナーなど、わかりやすいステップアップが重要なモチベーション要因。',why:'CHARTの職場環境・人間関係・条件面が現状「十分に安心できる水準」にある可能性が高い。転職リスクよりも今のポジションを活かす方が合理的という判断が働いている。'}
+  };
+
+  // ===== ACTIONS =====
+  const actions=[];
+  actions.push('担当顧客との信頼関係を深める：名前・身体の特徴・目標を把握し、「あなたに担当してもらいたい」と言われるトレーナーになることが最初の目標');
+  if(tr.sys>=2)actions.push('自分のセッションを振り返る習慣をつける：週1回でも「今週うまくいったこと・うまくいかなかったこと」を書き出し、型を作っていく');
+  if(tr.trainer>=2||tr.mgmt>=2)actions.push('後輩・新人への指導機会を積極的に取りに行く：教えることで自分の理解が深まり、育成実績がキャリアの証明になる');
+  if(tr.growth>=3)actions.push('半期ごとに上長と「自分がどうなりたいか」を明確に話す機会を設ける：評価を待つのではなく、方向性を自分から提示する');
+  if(tr.logic>=2)actions.push('自分の成果を言語化する習慣をつける：顧客の変化・担当実績・工夫した点を記録し、面談で話せる状態にしておく');
+  while(actions.length<4)actions.push('定期的に自己フィードバックの時間を設ける：月1回でも「自分は今成長しているか」を確認する習慣が長期的な成長を支える');
+
+  // ===== ROADMAP (現場トレーナー軸) =====
+  let roadmap=[];
+  var base3=[
+    {title:'現場トレーナー',desc:'担当顧客との信頼関係を築き、現場での結果を積み上げる段階。技術・接客・管理の基礎を固める。',elite:false},
+    {title:'チーフトレーナー / 後輩育成リーダー',desc:'複数名の指導役を担い、チームの底上げに貢献する段階。個人の成果からチームの成果へ視野が広がる。',elite:false},
+    {title:'シニアトレーナー',desc:'CHARTを代表するトレーナーとして専門性・顧客資産を積み上げる段階。後輩育成にも積極的に関わる現場のプロフェッショナル。',elite:false}
+  ];
+  if(is4thStage){
+    // 4段目の向き先：部署スコア上位2つから具体ルートを生成
+    var deptRoutes={
+      '現場トレーナー':'筆頭トレーナー（技術を極めCHARTを代表するプロフェッショナル）',
+      '人事部':'本部・人事部門担当（採用・育成・組織設計を担う中核）',
+      '店舗運営部':'エリア統括 / 本部・運営部門担当（複数店舗のマネジメント・店舗開発）',
+      'マーケティング部':'本部・マーケティング部門担当（ブランド戦略・集客設計・販促企画）',
+      '企業戦略部':'本部・企業戦略部担当（中期経営計画・新規事業・全社KPI設計）'
+    };
+    var sortedHere=[...depts].sort(function(a,b){return b.score-a.score;});
+    var top1=sortedHere[0].name;
+    var top2=sortedHere[1].name;
+    var routeText='あなたの場合は <strong>'+deptRoutes[top1]+'</strong>'+(sortedHere[1].score>=70?' または <strong>'+deptRoutes[top2]+'</strong>':'')+' が有力です。';
+    roadmap=base3.concat([
+      {title:'筆頭トレーナー / 本部職（エリア統括・マーケ等）',desc:'シニアトレーナーの先。技術を極めた筆頭トレーナー、または現場実績を武器にエリア統括・マーケティング・人事など本部部署へ展開するステージ。CHARTの中核を担う。<br><br>'+routeText,elite:true}
+    ]);
+  } else {
+    roadmap=base3;
+  }
+
+  // INTERVIEW QS
+  const iqs=[];
+  if(tr.motivation<=2||tr.risk_high>=1)iqs.push('今のCHARTでの仕事に、どんな「飽き」や「物足りなさ」を感じることがありますか？');
+  if(tr.w_emotion>=1)iqs.push('感情的に難しいと感じた場面を教えてください。そのときどう対処しましたか？');
+  if(tr.autonomy>=3)iqs.push('「もっと自分で決めたい」と感じる場面はありますか？具体的にどんな場面ですか？');
+  if(tr.meaning>=3)iqs.push('今の仕事の中で「意味を感じる瞬間」と「意味を感じにくい瞬間」を教えてください。');
+  if(tr.growth>=3)iqs.push('1年後の自分に何が「できるようになっていてほしい」ですか？そのために今何をしていますか？');
+  iqs.push(`${mbtiType}のような特性を持つ方は、自分の「強み」が過剰になることがあります。最近「やりすぎた」と思ったことはありますか？`);
+  iqs.push('CHARTで長く働く上で、会社や上司に「変えてほしいこと」があれば正直に聞かせてください。');
+  const iqsFinal=iqs.slice(0,5);
+
+  // ===== RENDER =====
+  showScreen('screen-result');
+  const genderLabel=userGender==='male'?'男性':userGender==='female'?'女性':'その他';
+  document.getElementById('result-name-display').textContent=userName;
+  document.getElementById('result-meta-display').textContent=`${userAge}歳 / ${genderLabel} / 診断日: ${new Date().toLocaleDateString('ja-JP')}`;
+
+  document.getElementById('mbti-type-display').textContent=mbtiType;
+  document.getElementById('mbti-name-display').textContent=mbtiNames[mbtiType]||mbtiType+'タイプ';
+  var mbtiAxHtml='';
+  mbtiAxes.forEach(function(ax){
+    var isL=ax.pct<50, dist=Math.abs(ax.pct-50);
+    var fill=isL?'<div class="axis-fill-l" style="width:'+dist+'%"></div>':'<div class="axis-fill-r" style="width:'+dist+'%"></div>';
+    mbtiAxHtml+='<div class="mbti-axis">'
+      +'<span class="axis-left'+(isL?' active':'')+'">'+ax.l+'</span>'
+      +'<div class="axis-bar"><div class="axis-center"></div>'+fill
+      +'<div class="axis-dot" style="left:'+ax.pct+'%"></div></div>'
+      +'<span class="axis-right'+(isL?'':' active')+'">'+ax.r+'</span></div>';
+  });
+  document.getElementById('mbti-axes-display').innerHTML=mbtiAxHtml;
+
+  document.getElementById('iq-value').textContent=iqDisplay;
+  document.getElementById('iq-range').textContent='推定レンジ: '+iqMsgs[iqLevel].range;
+  document.getElementById('iq-desc').textContent=iqMsgs[iqLevel].desc;
+  var iqNoteEl=document.getElementById('iq-note');
+  if(iqNoteEl){
+    if(iqDisplay>=133){iqNoteEl.textContent='※ この診断で測れる最高水準の数値です。実際の知的能力はさらに高い可能性があります。';iqNoteEl.style.display='block';}
+    else{iqNoteEl.style.display='none';}
+  }
+  document.getElementById('eq-total-value').textContent=eqTotal;
+  document.getElementById('eq-total-desc').textContent=eqTotalDesc;
+  document.getElementById('eq-axes-display').innerHTML=eqAxes.map(ax=>`<div class="eq-item">
+    <div class="eq-item-label">${ax.name}</div>
+    <div class="eq-bar-wrap"><div class="eq-bar-fill" style="width:${ax.score}%"></div></div>
+    <div class="eq-score-val">${ax.score}</div>
+    <div class="eq-desc">${ax.desc}</div>
+  </div>`).join('');
+
+  const deptsSorted=[...depts].sort((a,b)=>b.score-a.score);
+  document.getElementById('dept-scores-display').innerHTML=deptsSorted.map(d=>`<div class="dept-row">
+    <span class="dept-name">${d.name}</span>
+    <div class="dept-bar-wrap"><div class="dept-bar-fill ${d.over?'over100':''}" style="width:${Math.min(100,d.score)}%"></div></div>
+    <span class="dept-score ${d.over?'over100':''}">${d.score}${d.over?'🔥':''}</span>
+  </div>`).join('');
+
+  // ===== 総合企業戦略適性の表示 =====
+  var stRank=strategyBase>=110?'EXCEPTIONAL':strategyBase>=95?'EXCELLENT':strategyBase>=80?'STRONG':strategyBase>=65?'STANDARD':'DEVELOPING';
+  var stScoreEl=document.getElementById('strategy-score');
+  var stBarEl=document.getElementById('strategy-bar');
+  var stRankEl=document.getElementById('strategy-rank');
+  if(stScoreEl) stScoreEl.textContent=strategyBase;
+  if(stBarEl) stBarEl.style.width=Math.min(100,strategyBase/120*100)+'%';
+  if(stRankEl) stRankEl.textContent=stRank;
+
+  document.getElementById('potential-depts-display').innerHTML=potentialDepts.length>0?`
+    <div class="potential-label">適性があれば将来的に可能性のある部署</div>
+    <div class="potential-list">${potentialDepts.map(p=>`<span class="potential-tag">${p}</span>`).join('')}</div>
+    <div class="potential-note">現時点での確定ではありません。現場での実績と行動次第で、これらの部署・役割への展開が考えられます。面談で一緒に可能性を探りましょう。</div>
+  `:'<div class="potential-note" style="padding:0">現在の現場トレーナーとしての専門性を深めることが最優先です。実績を積み上げることで新たな可能性が開けてきます。</div>';
+
+  document.getElementById('strengths-display').innerHTML=strengths.map(s=>`<span class="tag tag-strength">${s}</span>`).join('');
+  document.getElementById('weaknesses-display').innerHTML=weaknesses.map(w=>`<span class="tag tag-weakness">${w}</span>`).join('');
+  document.getElementById('behavior-display').textContent=behavior;
+
+  const m=motives[topMotive];
+  document.getElementById('motive-core-display').textContent=m.core;
+  document.getElementById('motive-chart-route-display').textContent=m.route;
+  document.getElementById('motive-why-chart-display').textContent=m.why;
+
+  document.getElementById('actions-display').innerHTML=actions.slice(0,5).map((a,i)=>`<div class="action-item"><span class="action-num">${i+1}</span><span class="action-text">${a}</span></div>`).join('');
+
+  var navyKw=['シニアトレーナー','筆頭トレーナー','エリア統括','内部部署','人事部門','店舗運営'];
+  var rdHtml='';
+  roadmap.forEach(function(step,i){
+    var cls=step.elite?'elite':(step.title&&navyKw.some(function(k){return step.title.indexOf(k)>=0;})?'navy':'');
+    var badge=step.elite?' <span class="top-badge">TOP</span>':'';
+    rdHtml+='<div class="roadmap-step '+cls+'"><div class="roadmap-content"><h4>'+step.title+badge+'</h4><p>'+step.desc+'</p></div></div>';
+    if(i<roadmap.length-1) rdHtml+='<div class="roadmap-arrow">↓</div>';
+  });
+  if(roadmap.some(function(st){return st.elite;})) rdHtml+='<div class="roadmap-note">※ 診断スコアの総合値が一定水準以上の方にのみ表示されるステップです</div>';
+  document.getElementById('roadmap-display').innerHTML=rdHtml;
+
+  document.getElementById('interview-qs-display').innerHTML=iqsFinal.map(q=>`<div class="interview-q">${q}</div>`).join('');
+  // 回答一覧の描画
+  var ansHtml='';
+  questions.forEach(function(q){
+    var sel=answers[q.id];
+    if(sel===undefined)return;
+    var letter=String.fromCharCode(65+sel);
+    ansHtml+='<div style="display:grid;grid-template-columns:auto 1fr;gap:12px;padding:12px 14px;background:#fafafa;border:1px solid #e8e8e8;border-radius:4px;">'
+      +'<div style="font-family:\'DM Mono\',monospace;font-size:11px;color:#c79a3a;font-weight:700;white-space:nowrap;">Q'+q.id+' '+letter+'</div>'
+      +'<div><div style="font-size:13px;color:#333;margin-bottom:5px;line-height:1.5;font-weight:500;">'+q.text+'</div>'
+      +'<div style="font-size:13px;color:#1a1a1a;font-weight:600;line-height:1.5;">'+q.options[sel]+'</div></div></div>';
+  });
+  var ansEl=document.getElementById('answers-display');
+  if(ansEl)ansEl.innerHTML=ansHtml;
+
+  // store for copy
+  window._rd={is4thStage:is4thStage,userName,userAge,genderLabel,mbtiType,mbtiNames,iqDisplay,iqLevel,iqMsgs,eqTotal,eqAxes,deptsSorted,potentialDepts,strengths,weaknesses,behavior,m,topMotive,actions,roadmap,iqsFinal,strategyScore:strategyBase};
+
+  // 隠し診断解放チェック（最優秀＝バランス型[4段+IQ125+共感60] または 突き抜け型[4段+IQ138+対人90]）
+  if(is4thStage && ((iqDisplay>=125 && eqAxes[1].score>=60) || (iqDisplay>=138 && eqAxes[3].score>=90))){
+    setTimeout(function(){
+      var el=document.getElementById('secret-unlock');
+      if(el) el.style.display='block';
+    },800);
+  }
+}
+
+function buildCopyText(){
+  var d=window._rd;
+  if(!d)return'';
+  var out=[];
+  out.push('■ CHART HR診断結果 — '+d.userName+'（'+d.userAge+'歳 / '+d.genderLabel+'）');
+  out.push('診断日: '+new Date().toLocaleDateString('ja-JP'));
+  out.push('');
+  out.push('━━ MBTIタイプ推定 ━━');
+  out.push(d.mbtiType+' — '+(d.mbtiNames[d.mbtiType]||d.mbtiType+'タイプ'));
+  out.push('');
+  out.push('━━ IQ推定 ━━');
+  out.push('スコア: '+d.iqDisplay+'（推定レンジ: '+d.iqMsgs[d.iqLevel].range+'）');
+  out.push(d.iqMsgs[d.iqLevel].desc);
+  out.push('');
+  out.push('━━ EQ推定（総合: '+d.eqTotal+'/100） ━━');
+  d.eqAxes.forEach(function(ax){out.push(ax.name+': '+ax.score+' — '+ax.desc);});
+  out.push('');
+  out.push('━━ 部署適性スコア ━━');
+  d.deptsSorted.forEach(function(dep){out.push(dep.name+': '+dep.score);});
+  out.push('将来的に可能性のある部署: '+(d.potentialDepts.join('、')||'現部署の深化を優先'));
+  out.push('');
+  out.push('━━ 総合企業戦略適性 ━━');
+  out.push('スコア: '+d.strategyScore+' / 120');
+  out.push('※ 全部署適性や選択肢から見た、総合的な企業戦略適性数値（経営企画・戦略立案・全社視点）');
+  out.push('');
+  out.push('━━ 強み ━━');
+  out.push(d.strengths.join('、'));
+  out.push('');
+  out.push('━━ 弱み・盲点 ━━');
+  out.push(d.weaknesses.join('、'));
+  out.push('');
+  out.push('━━ 職場での行動傾向 ━━');
+  out.push(d.behavior);
+  out.push('');
+  out.push('━━ 潜在欲求 ━━');
+  out.push(d.m.core);
+  out.push('');
+  out.push('━━ CHARTでの充足ルート ━━');
+  out.push(d.m.route);
+  out.push('');
+  out.push('━━ 今CHARTにいる理由の仮説 ━━');
+  out.push(d.m.why);
+  out.push('');
+  out.push('━━ 今後の推奨行動 ━━');
+  d.actions.slice(0,5).forEach(function(a,i){out.push((i+1)+'. '+a);});
+  out.push('');
+  out.push('━━ キャリアロードマップ ━━');
+  d.roadmap.forEach(function(s,i){out.push((i+1)+'. '+s.title+(s.elite?' [TOP]':''));out.push(s.desc.replace(/<br\s*\/?>/g,'\n').replace(/<\/?strong>/g,''));out.push('');});
+  out.push('━━ 面談での深掘り推奨質問 ━━');
+  d.iqsFinal.forEach(function(q,i){out.push('Q'+(i+1)+'. '+q);});
+  out.push('');
+  out.push('━━ 回答一覧 ━━');
+  questions.forEach(function(q){
+    var sel=answers[q.id];
+    if(sel===undefined)return;
+    out.push('Q'+q.id+'（'+q.section+'）'+String.fromCharCode(65+sel)+'. '+q.options[sel]);
+  });
+  if(window._secretResult){
+    var sr=window._secretResult;
+    out.push('');
+    out.push('━━ 最高職適性診断（上位者限定） ━━');
+    out.push('1位: '+sr.topTitle+'（'+sr.topRank+' / '+sr.topScore+'点）');
+    out.push(sr.topDesc);
+    out.push('');
+    out.push('他ポジション:');
+    sr.allScores.slice(1).forEach(function(s){out.push(s.name+': '+s.score+'点（'+s.rank+'）');});
+    out.push('※ エリア統括以上の実績を経た先の将来的な適性推定です');
+  }
+  return out.join('\n').trim();
+}
+
+function copyResult(){
+  var text=buildCopyText();
+  if(!text)return;
+  function onDone(){
+    var el=document.getElementById('copy-success');
+    if(el){el.style.display='block';setTimeout(function(){el.style.display='none';},3000);}
+    var wrap=document.getElementById('copy-preview-wrap');
+    var box=document.getElementById('copy-preview-box');
+    if(box) box.textContent=text;
+    if(wrap){wrap.style.display='block';wrap.classList.add('visible');try{wrap.scrollIntoView({behavior:'smooth',block:'nearest'});}catch(e){}}
+  }
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(onDone,onDone);
+    } else { onDone(); }
+  }catch(e){ onDone(); }
+}
+
+function sendLineWorks(){
+  var text=buildCopyText();
+  if(!text){alert('先に診断を完了してください');return;}
+  function doOpen(){
+    try{window.open('lineworks://message','_blank');}catch(e){}
+    var wrap=document.getElementById('copy-preview-wrap');
+    var box=document.getElementById('copy-preview-box');
+    if(box) box.textContent=text;
+    if(wrap){wrap.style.display='block';wrap.classList.add('visible');}
+    alert('テキストをコピーしました。\nLINE WORKSが開いたら、人事部 飯泉のトークに貼り付けて送信してください。');
+  }
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(doOpen,doOpen);
+    } else { doOpen(); }
+  }catch(e){ doOpen(); }
+}
+
+// ===== SECRET DIAGNOSIS =====
+var secretQuestions=[
+  {id:'s1',text:'組織の大きな問題を発見した。あなたが最初にやることは？',options:['すぐに動いて解決の糸口を作る','関係者を集めて合意形成から始める','データや原因を徹底的に分析してから動く','適任者に委ね、自分は方針だけ決める'],scores:[{exec:1,decision:'instant'},{exec:0,decision:'consensus'},{exec:1,decision:'analysis'},{exec:2,decision:'delegate'}]},
+  {id:'s2',text:'自分についてこないメンバーへの対処として、最も近いのは？',options:['明確な指示と期待値を再設定する','なぜついてこないか本音を聞き出す','一定期間様子を見て判断する','そのメンバーを別の役割に移す'],scores:[{lead:'directive',hr_s:1},{lead:'support',hr_s:2},{lead:'wait',ops_s:1},{lead:'realloc',hr_s:1,ops_s:1}]},
+  {id:'s3',text:'100人規模になったCHARTで、自分が最も担いたい役割は？',options:['現場の質を極限まで高める統括トレーナー','人材採用・育成・評価の仕組みを設計する','店舗運営・数字・オペレーションを管理する','ブランド・集客・マーケティングを牽引する'],scores:[{trainer_exec:4,hr_exec:0,ops_exec:0,mkt_exec:0},{trainer_exec:0,hr_exec:4,ops_exec:0,mkt_exec:0},{trainer_exec:0,hr_exec:0,ops_exec:4,mkt_exec:0},{trainer_exec:0,hr_exec:0,ops_exec:0,mkt_exec:4}]},
+  {id:'s4',text:'自分が組織の意思決定に関わるとき、最も大切にすることは？',options:['スピードと実行力。考えすぎず動く','データと根拠。感情で決めない','現場の声と人の状態を最優先にする','長期的なビジョンとの整合性'],scores:[{exec_style:'speed',ops_s:1,trainer_s:1},{exec_style:'data',mkt_s:1,ops_s:1},{exec_style:'people',hr_s:2,trainer_s:1},{exec_style:'vision',mkt_s:2,hr_s:1}]},
+  {id:'s5',text:'率直に、自分の最大の武器は何か？',options:['どんな状況でも動かせる実行力と突破力','複雑な問題を構造化・言語化する設計力','人を動かし、組織の空気を変える影響力','先を読み、勝ちパターンを設計する戦略眼'],scores:[{weapon:'execute',trainer_s:2,ops_s:2},{weapon:'design',ops_s:2,mkt_s:2},{weapon:'influence',hr_s:3,trainer_s:1},{weapon:'strategy',hr_s:1,mkt_s:2,ops_s:1}]}
+];
+var secretAnswers={};
+var secretCurrentQ=0;
+
+function startSecretDiagnosis(){
+  document.getElementById('secret-unlock').style.display='none';
+  document.getElementById('secret-q-area').style.display='block';
+  secretCurrentQ=0; secretAnswers={};
+  renderSecretQ(0);
+}
+
+function renderSecretQ(idx){
+  var q=secretQuestions[idx];
+  var pct=Math.round((idx/5)*100);
+  var optsHtml='';
+  for(var i=0;i<q.options.length;i++){
+    var sel=secretAnswers[q.id]===i?' selected':'';
+    optsHtml+='<div class="secret-option'+sel+'" data-qid="'+q.id+'" data-i="'+i+'" data-idx="'+idx+'" onclick="handleSecretClick(this)">'
+      +'<span class="secret-option-key">'+String.fromCharCode(65+i)+'</span><span>'+q.options[i]+'</span></div>';
+  }
+  document.getElementById('secret-question-area').innerHTML=
+    '<div style="font-size:9px;letter-spacing:3px;color:#d4aa50;text-transform:uppercase;margin-bottom:12px;">Question '+(idx+1)+' / 5</div>'
+    +'<div style="background:#f5f5f5;height:2px;margin-bottom:24px;"><div style="height:100%;background:#b8860b;width:'+pct+'%;transition:width .4s;"></div></div>'
+    +'<div style="font-size:18px;font-weight:700;line-height:1.6;margin-bottom:28px;color:#111;">'+q.text+'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:10px;">'+optsHtml+'</div>';
+}
+
+function handleSecretClick(el){
+  var qId=el.getAttribute('data-qid');
+  var optIdx=parseInt(el.getAttribute('data-i'));
+  var idx=parseInt(el.getAttribute('data-idx'));
+  selectSecretQ(qId,optIdx,idx);
+}
+
+function selectSecretQ(qId,optIdx,idx){
+  secretAnswers[qId]=optIdx;
+  document.querySelectorAll('.secret-option').forEach(function(el,i){el.classList.toggle('selected',i===optIdx);});
+  setTimeout(function(){
+    if(idx<4){secretCurrentQ++;renderSecretQ(secretCurrentQ);}
+    else{computeSecretResult();}
+  },350);
+}
+
+function computeSecretResult(){
+  var d=window._rd;
+  var sec={hr_exec:0,trainer_exec:0,ops_exec:0,mkt_exec:0,hr_s:0,trainer_s:0,ops_s:0,mkt_s:0};
+  secretQuestions.forEach(function(q){
+    var sel=secretAnswers[q.id];
+    if(sel===undefined) return;
+    var s=q.scores[sel];
+    Object.keys(s).forEach(function(k){if(typeof s[k]==='number') sec[k]=(sec[k]||0)+s[k];});
+  });
+  var deptScores={};
+  if(d&&d.deptsSorted) d.deptsSorted.forEach(function(dep){deptScores[dep.name]=dep.score;});
+  var baseHR=(sec.hr_exec*15+sec.hr_s*8+(deptScores['人事部']||50)*0.3+(d?d.eqAxes[0].score*0.2:0));
+  var baseTR=(sec.trainer_exec*15+sec.trainer_s*8+(deptScores['現場トレーナー']||50)*0.3+(d?d.eqAxes[1].score*0.15:0));
+  var baseOP=(sec.ops_exec*15+sec.ops_s*8+(deptScores['店舗運営部']||50)*0.3+(d?d.eqAxes[3].score*0.2:0));
+  var baseMK=(sec.mkt_exec*15+sec.mkt_s*8+(deptScores['マーケティング部']||50)*0.3+(d?d.eqAxes[2].score*0.1:0));
+  var maxBase=Math.max(baseHR,baseTR,baseOP,baseMK,1);
+  function norm(v){return Math.min(100,Math.max(38,Math.round((v/maxBase)*62+38)));}
+  var scores={'最高人事部事業責任者':norm(baseHR),'最高筆頭トレーナー':norm(baseTR),'最高店舗運営部事業責任者':norm(baseOP),'最高マーケティング部事業責任者':norm(baseMK)};
+  function getrank(s){return s>=88?'SS':s>=75?'S':s>=60?'A':'B';}
+  var sorted=Object.keys(scores).map(function(k){return [k,scores[k]];}).sort(function(a,b){return b[1]-a[1];});
+  var top=sorted[0];
+  var topRank=getrank(top[1]);
+  var descs={
+    '最高人事部事業責任者':{SS:'組織設計・人材育成・採用戦略を統括する適性が最も高い。自己認識の深さと論理構造力を武器に、CHARTの人的資本を戦略的に設計できる人物像に合致する。',S:'人事領域での高いポテンシャルが見られる。育成と組織設計への関心が強く、経験を積むことで事業責任者クラスのキャリアが視野に入る。',A:'人事領域への適性はある。意思決定のスピードと影響力の強化が、責任者クラスへの鍵になる。',B:'現時点では他領域での経験蓄積が先決。'},
+    '最高筆頭トレーナー':{SS:'技術・接客・育成の全てを極めた、CHARTを代表するトレーナーへの適性が突出している。現場への圧倒的なコミットと後進育成力が融合したとき、最高位に到達できる。',S:'トレーナーとしての専門性と影響力の両立に高い適性がある。',A:'トレーナーとしての基礎適性はある。専門性の深化と後輩への関わり方が昇格の鍵。',B:'現時点ではトレーナーとしての経験蓄積が最優先。'},
+    '最高店舗運営部事業責任者':{SS:'数字・オペレーション・組織管理を統合する適性が最も高い。論理的な問題解決力と実行力が掛け合わさったとき、複数拠点を統括する運営責任者として機能できる。',S:'運営領域でのポテンシャルが高い。数値管理と現場マネジメントの経験を積むことで責任者クラスのキャリアが現実的になる。',A:'運営への適性はある。現場での数値責任と問題解決の実績が次のステージへの鍵。',B:'運営職への道は長期的な視点で。'},
+    '最高マーケティング部事業責任者':{SS:'ブランド・集客・コンテンツ・戦略設計を統括する適性が突出している。発想力と構造化能力の両立が、CHARTのマーケティングを牽引するポジションへの最短ルートになる。',S:'マーケティング領域での高いポテンシャルがある。アイデアを実行に落とし込む経験を積むことで責任者クラスへの道が開ける。',A:'マーケへの適性はある。発想を形にする実行力と数値での証明が次のステージへの鍵。',B:'現時点では他領域での実績蓄積が先。'}
+  };
+  var topDesc=(descs[top[0]]&&descs[top[0]][topRank])||'';
+  var othersHtml='';
+  sorted.slice(1).forEach(function(item){
+    othersHtml+='<div class="exec-other-row"><span class="exec-other-name">'+item[0]+'</span><span class="exec-other-score">'+item[1]+'</span><span class="exec-other-rank">'+getrank(item[1])+'</span></div>';
+  });
+  document.getElementById('secret-q-area').style.display='none';
+  document.getElementById('secret-result-area').style.display='block';
+  document.getElementById('secret-result-display').innerHTML=
+    '<div class="exec-card">'
+    +'<div style="font-size:9px;letter-spacing:3px;color:#d4aa50;text-transform:uppercase;margin-bottom:12px;">最高職適性 1位</div>'
+    +'<div class="exec-rank '+topRank+'">'+topRank+'</div>'
+    +'<div class="exec-title">'+top[0]+'</div>'
+    +'<div class="exec-score-bar-wrap"><div class="exec-score-bar" style="width:'+top[1]+'%"></div></div>'
+    +'<div style="font-family:DM Mono,monospace;font-size:11px;color:#d4aa50;margin-bottom:16px;">適性スコア: '+top[1]+' / 100</div>'
+    +'<div class="exec-desc">'+topDesc+'</div></div>'
+    +'<div style="font-size:9px;letter-spacing:3px;color:#888;text-transform:uppercase;margin-bottom:12px;margin-top:20px;">他ポジションの適性</div>'
+    +othersHtml
+    +'<div style="font-size:11px;color:#aaa;margin-top:16px;padding:10px 14px;border:1px dashed #ddd;line-height:1.7;">ランク基準：SS（88〜）/ S（75〜87）/ A（60〜74）/ B（〜59）<br>※ 評価は現時点ではなく、将来的なポテンシャルの推定です。エリア統括以上の実績を経た先の適性を測定しています。</div>';
+  window._secretResult={topTitle:top[0],topRank:topRank,topScore:top[1],topDesc:topDesc,allScores:sorted.map(function(item){return {name:item[0],score:item[1],rank:getrank(item[1])};})};
+  // 最高職結果が出たので、コピープレビューが既に表示済みなら内容を最新化
+  var pvBox=document.getElementById('copy-preview-box');
+  var pvWrap=document.getElementById('copy-preview-wrap');
+  if(pvBox && pvWrap && pvWrap.style.display==='block'){
+    pvBox.textContent=buildCopyText();
+  }
+}
+
+</script>
+
+</body>
+</html>
