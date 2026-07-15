@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHART キャリア診断</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f8f6f2;--surface:#fff;--border:#e2ddd6;--accent:#b5833a;--al:#f2e8d8;--accent2:#3a7eb5;--text:#1c1a16;--sub:#6b6560;--muted:#a8a098;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:15px;line-height:1.65;min-height:100vh;}
+.wrap{max-width:660px;margin:0 auto;padding:36px 20px 100px;}
+.hd{text-align:center;padding:52px 0 44px;}
+.badge{display:inline-block;font-size:10px;letter-spacing:.28em;color:var(--accent);border:1px solid var(--accent);padding:5px 16px;margin-bottom:26px;}
+.hd h1{font-family:'Shippori Mincho',serif;font-size:clamp(1.7rem,5.5vw,2.6rem);font-weight:600;line-height:1.35;margin-bottom:16px;}
+.hd h1 em{color:var(--accent);font-style:normal;}
+.hd p{font-size:13px;color:var(--sub);line-height:1.9;}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:36px 0 40px;}
+@media(max-width:500px){.sgrid{grid-template-columns:1fr;}}
+.sc{background:var(--surface);border:1px solid var(--border);padding:22px 18px;}
+.sc-n{font-family:'Shippori Mincho',serif;font-size:2rem;color:var(--accent);margin-bottom:8px;}
+.sc-t{font-size:12px;font-weight:700;margin-bottom:5px;}
+.sc-d{font-size:11px;color:var(--sub);line-height:1.55;}
+.center{text-align:center;}
+.prog{margin-bottom:30px;}
+.pmeta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:7px;}
+.ptrack{height:3px;background:var(--border);border-radius:3px;overflow:hidden;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease;}
+.qtag{display:inline-block;font-size:10px;padding:3px 10px;border-radius:20px;margin-bottom:14px;font-weight:700;letter-spacing:.05em;}
+.qtag-w{background:#fff3e0;color:#b5833a;}
+.qtag-i{background:#e8f0fe;color:#3a7eb5;}
+.qtag-r{background:#e8f5e9;color:#2a8a52;}
+.qcard{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);padding:34px 30px 28px;margin-bottom:22px;}
+@media(max-width:500px){.qcard{padding:26px 18px 22px;}}
+.qnum{font-size:10px;letter-spacing:.22em;color:var(--accent);margin-bottom:10px;display:block;}
+.qtext{font-family:'Shippori Mincho',serif;font-size:18px;font-weight:600;line-height:1.55;margin-bottom:8px;}
+.qsub{font-size:12px;color:var(--sub);margin-bottom:24px;line-height:1.6;}
+.opts{display:grid;gap:9px;}
+.opt{background:var(--bg);border:1.5px solid var(--border);padding:13px 18px;text-align:left;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:14px;color:var(--text);line-height:1.5;transition:all .14s;display:flex;align-items:flex-start;gap:12px;}
+.opt:hover{border-color:var(--accent);background:var(--al);}
+.opt.sel{border-color:var(--accent);background:var(--al);}
+.ok{font-size:10px;color:var(--muted);min-width:18px;margin-top:2px;flex-shrink:0;font-weight:700;}
+.opt.sel .ok{color:var(--accent);}
+.nav{display:flex;gap:12px;justify-content:flex-end;}
+.btn{font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:500;padding:12px 26px;cursor:pointer;border:none;transition:all .15s;letter-spacing:.06em;}
+.btn-g{background:transparent;border:1.5px solid var(--border);color:var(--sub);}
+.btn-g:hover{border-color:var(--sub);color:var(--text);}
+.btn-p{background:var(--accent);color:#fff;font-weight:700;}
+.btn-p:hover{background:#9e7030;}
+.rtop{text-align:center;padding:44px 0 36px;border-bottom:1px solid var(--border);margin-bottom:36px;}
+.rtop h2{font-family:'Shippori Mincho',serif;font-size:1.9rem;margin-bottom:10px;}
+.htag{display:inline-block;background:var(--al);border:1px solid var(--accent);color:var(--accent);font-size:14px;font-weight:700;padding:8px 22px;margin-top:10px;letter-spacing:.05em;}
+.s3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:28px;}
+@media(max-width:500px){.s3{grid-template-columns:1fr;}}
+.scard{background:var(--surface);border:1px solid var(--border);padding:22px 16px;text-align:center;}
+.scard-label{font-size:10px;letter-spacing:.18em;color:var(--muted);margin-bottom:10px;display:block;line-height:1.5;}
+.scard-num{font-family:'Shippori Mincho',serif;font-size:3rem;line-height:1;margin-bottom:6px;}
+.scard-bar{height:4px;background:var(--border);border-radius:4px;overflow:hidden;margin:8px 0 10px;}
+.scard-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.scard-grade{font-size:11px;font-weight:700;letter-spacing:.1em;}
+.scard-note{font-size:11px;color:var(--sub);line-height:1.5;margin-top:5px;}
+.rsec{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);padding:28px 24px;margin-bottom:20px;}
+@media(max-width:500px){.rsec{padding:20px 16px;}}
+.rlabel{font-size:10px;letter-spacing:.28em;color:var(--accent);margin-bottom:16px;display:block;font-weight:700;}
+.rbody{font-size:13px;color:var(--sub);line-height:1.95;}
+.rtitle{font-family:'Shippori Mincho',serif;font-size:1.3rem;margin-bottom:12px;}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+.tag{font-size:12px;padding:5px 13px;border:1px solid;border-radius:2px;}
+.tag-s{border-color:rgba(42,138,82,.4);color:#2a8a52;background:rgba(42,138,82,.06);}
+.tag-g{border-color:rgba(58,126,181,.4);color:var(--accent2);background:rgba(58,126,181,.06);}
+.sw-head{font-size:11px;font-weight:700;letter-spacing:.1em;margin-bottom:7px;margin-top:18px;}
+.sw-head:first-child{margin-top:0;}
+.tl{padding-left:22px;border-left:2px solid var(--border);}
+.tl-item{position:relative;padding:0 0 30px 22px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-item::before{content:'';position:absolute;left:-8px;top:5px;width:14px;height:14px;border-radius:50%;background:var(--accent);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--accent);}
+.tl-period{font-size:11px;letter-spacing:.12em;color:var(--accent);margin-bottom:5px;font-weight:700;}
+.tl-role{font-size:15px;font-weight:700;margin-bottom:5px;}
+.tl-salary{font-family:'Shippori Mincho',serif;font-size:1.2rem;color:var(--accent2);margin-bottom:7px;}
+.tl-desc{font-size:12px;color:var(--sub);line-height:1.75;}
+.depts{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:440px){.depts{grid-template-columns:1fr;}}
+.dept{background:var(--bg);border:1.5px solid var(--border);padding:18px;position:relative;}
+.dept.best{border-color:var(--accent);background:var(--al);}
+.bbadge{position:absolute;top:-1px;right:14px;background:var(--accent);color:#fff;font-size:9px;letter-spacing:.18em;padding:3px 9px;font-weight:700;}
+.dname{font-size:12px;font-weight:700;margin-bottom:8px;line-height:1.45;}
+.dscore{font-family:'Shippori Mincho',serif;font-size:2rem;color:var(--accent);}
+.dscore span{font-size:.6em;color:var(--muted);}
+.dnote{font-size:11px;color:var(--sub);margin-top:6px;line-height:1.55;}
+.sending{text-align:center;padding:40px 20px;font-size:13px;color:var(--sub);}
+.spin{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:0 auto 16px;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div class="badge">CHART × CAREER SIMULATOR</div>
+    <h1>あなたのCHARTでの<br><em>キャリアを見てみる</em></h1>
+    <p>16の質問に答えるだけで、入社後のキャリアパス・<br>給与レンジ・部署適性をシミュレートします。</p>
+  </div>
+  <div id="app"></div>
+</div>
+<script>
+// ═══════════════════════════════════════
+// GASエンドポイント（設定してください）
+// ═══════════════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyfLQi0xjpAYNOFFgXim4yhTV30xRweYExOHFXdlVRl__5csrHfK42GkN0ZYNaGNh2Ldg/exec';
+// 例: 'https://script.google.com/macros/s/XXXXX/exec'
+// 空欄のままでも診断は動作します
+
+// ═══════════════════════════════════════
+// 質問定義 type: W=ワクワク系 I=内省系 R=関わり方系
+// s = [store, area, marketing, hr, trainer, match]
+// リズム: W,W,I,R, W,W,I,R, W,W,I,R, W,W,I,R
+// ═══════════════════════════════════════
+const QS = [
+  // ─ブロック1─
+  {id:'q01',type:'W',
+   text:'仕事をしていて一番テンションが上がる瞬間は？',
+   opts:[
+    {t:'誰かが変わった瞬間に立ち会えたとき',    s:[14,8,5,12,12,14]},
+    {t:'チームで目標を達成したとき',            s:[8,14,10,10,10,10]},
+    {t:'自分のアイデアが形になったとき',         s:[5,10,14,8,8,8]},
+    {t:'仲間と本音で話せたとき',               s:[14,5,5,12,12,12]},
+    {t:'自分の数字が出たとき',                 s:[8,14,14,5,8,8]},
+  ]},
+  {id:'q02',type:'W',
+   text:'3年後、どんな自分でいたい？',
+   sub:'一番ワクワクするイメージを',
+   opts:[
+    {t:'整体・トレーニングのプロとして独り立ち', s:[18,5,5,5,16,8]},
+    {t:'チームや店舗をまとめるリーダー',         s:[8,20,5,8,8,8]},
+    {t:'採用・研修など組織をつくる人',           s:[5,8,5,20,5,10]},
+    {t:'CHARTの顔として発信・成長を担う',        s:[5,12,18,8,5,8]},
+    {t:'独立・起業を視野に入れている',           s:[5,12,14,5,8,5]},
+  ]},
+  {id:'q03',type:'I',
+   text:'自分の一番の強みは何だと思う？',
+   sub:'直感で選んでください',
+   opts:[
+    {t:'人に自然と好かれる・信頼される',         s:[14,8,5,10,14,12]},
+    {t:'場の空気をつくる・安心感を出せる',        s:[14,5,5,12,14,14]},
+    {t:'動きながら改善していく実行力',           s:[14,12,8,5,12,8]},
+    {t:'教える・育てる・伝える力',              s:[8,8,5,20,10,10]},
+    {t:'構造を整理して設計する力',              s:[5,12,16,10,8,5]},
+  ]},
+  {id:'q04',type:'R',
+   text:'お客様との関係で、一番大切にしたいのは？',
+   opts:[
+    {t:'長く続く信頼関係',                    s:[14,8,5,10,14,14]},
+    {t:'その人の人生に本当に役立つこと',          s:[12,8,5,12,12,14]},
+    {t:'安心して何でも話せる雰囲気',             s:[14,5,5,12,14,12]},
+    {t:'期待以上の結果を出すこと',              s:[8,12,10,8,10,8]},
+    {t:'効率よく、高品質に届けること',           s:[5,12,14,5,5,5]},
+  ]},
+  // ─ブロック2─
+  {id:'q05',type:'W',
+   text:'理想の職場の雰囲気は？',
+   opts:[
+    {t:'熱量があって、仲間を大切にする文化',      s:[12,10,5,10,12,12]},
+    {t:'個人の裁量が大きく、自分で決められる',     s:[5,12,16,8,8,8]},
+    {t:'人の成長を一緒に喜べる温かい環境',        s:[14,5,5,14,12,14]},
+    {t:'結果が正直に評価される実力主義',          s:[8,14,12,5,8,8]},
+    {t:'安心して長く働き続けられる場所',          s:[10,8,8,12,10,10]},
+  ]},
+  {id:'q06',type:'W',
+   text:'CHARTで一番やってみたいことは？',
+   opts:[
+    {t:'お客様の体と人生を変えるトレーナー',       s:[18,5,5,5,16,10]},
+    {t:'チームや店舗をぐんぐん成長させること',      s:[5,18,8,8,5,8]},
+    {t:'採用・育成・組織づくりを担うこと',         s:[5,8,5,20,5,10]},
+    {t:'SNS・マーケでCHARTの魅力を届けること',    s:[5,8,18,5,5,8]},
+    {t:'まだ具体的にはわからないが、全力でやってみたい', s:[10,10,10,10,10,10]},
+  ]},
+  {id:'q07',type:'I',
+   text:'自分が「成長した」と感じるのはどんなとき？',
+   opts:[
+    {t:'誰かの変化に自分が関わったとき',          s:[14,8,5,12,12,14]},
+    {t:'昨日できなかったことができたとき',         s:[10,10,10,10,12,10]},
+    {t:'チームが自分のおかげで良くなったとき',      s:[8,14,8,14,10,10]},
+    {t:'自分のやり方が仕組みになったとき',         s:[5,12,12,14,8,10]},
+    {t:'数字や結果で証明されたとき',              s:[5,14,14,5,8,5]},
+  ]},
+  {id:'q08',type:'R',
+   text:'誰かの話を聞くとき、自分に近いのは？',
+   opts:[
+    {t:'相手の気持ちが自然と気になる',            s:[14,5,5,12,14,12]},
+    {t:'うなずきながら、最後まで聞く',            s:[12,5,5,14,12,12]},
+    {t:'解決策を一緒に考えながら聞く',            s:[5,12,10,8,8,8]},
+    {t:'相手が何を必要としているか考えながら聞く',   s:[10,8,8,12,12,12]},
+    {t:'問題の構造を整理しながら聞く',            s:[5,10,12,8,8,8]},
+  ]},
+  // ─ブロック3─
+  {id:'q09',type:'W',
+   text:'自分が輝ける場面はどんなとき？',
+   opts:[
+    {t:'一対一で深く向き合っているとき',          s:[14,5,5,12,14,12]},
+    {t:'チームを引っ張って動かしているとき',        s:[8,16,8,8,8,8]},
+    {t:'新しいアイデアを形にしているとき',         s:[5,10,16,8,8,8]},
+    {t:'誰かに「ありがとう」と言われたとき',        s:[14,5,5,14,12,14]},
+    {t:'コツコツ積み上げてきたものが結実したとき',   s:[12,10,8,10,12,10]},
+  ]},
+  {id:'q10',type:'W',
+   text:'長く働く上で、一番大切にしたいことは？',
+   opts:[
+    {t:'お客様に長く・深く関わりたい',            s:[14,5,5,10,12,14]},
+    {t:'仲間や後輩の成長に貢献したい',            s:[8,12,5,16,8,10]},
+    {t:'会社と一緒に大きくなっていきたい',         s:[8,16,12,8,8,8]},
+    {t:'スキルと信頼を積み上げて社内で進化したい',   s:[10,10,10,10,10,10]},
+    {t:'ライフスタイルと仕事を両立させたい',        s:[10,5,10,10,10,8]},
+  ]},
+  {id:'q11',type:'I',
+   text:'自分の感情や気分のコントロール、正直なところは？',
+   sub:'答えにくいかもしれませんが正直に',
+   opts:[
+    {t:'ほぼ安定している',                    s:[8,12,10,8,12,12]},
+    {t:'だいたいできている',                   s:[8,10,8,8,10,10]},
+    {t:'波はあるが、引きずらない',              s:[8,8,8,8,8,8]},
+    {t:'影響は受けるが、立て直せる',             s:[10,5,8,10,8,8]},
+    {t:'感情が出やすいが、それが強みでもある',     s:[12,5,5,10,10,8]},
+  ]},
+  {id:'q12',type:'R',
+   text:'職場で気まずい関係になったとき、どうする？',
+   opts:[
+    {t:'自分から声をかけて関係を戻す',            s:[12,8,5,12,10,12]},
+    {t:'相手の事情を想像して理解しようとする',      s:[10,8,8,14,10,12]},
+    {t:'時間をおいてから普通に話しかける',         s:[8,10,8,8,8,8]},
+    {t:'逃げずに向き合う',                     s:[10,12,5,10,10,10]},
+    {t:'仕事上は普通に接する',                  s:[5,10,12,5,5,5]},
+  ]},
+  // ─ブロック4─
+  {id:'q13',type:'W',
+   text:'整体・パーソナルトレーニングの業界に興味を持ったのは？',
+   opts:[
+    {t:'人の変化や成長に関わりたかった',          s:[10,8,5,14,12,14]},
+    {t:'自分自身が体・健康に関心があった',         s:[14,5,5,5,16,10]},
+    {t:'CHARTの雰囲気や理念に惹かれた',          s:[8,10,8,10,8,12]},
+    {t:'手に職をつけながら成長したかった',         s:[5,14,12,5,8,8]},
+    {t:'知人・家族のつながりがきっかけ',           s:[10,5,5,5,10,8]},
+  ]},
+  {id:'q14',type:'W',
+   text:'CHARTの文化で、最も共感できるのは？',
+   opts:[
+    {t:'技術より人間力・愛情が強みになる',         s:[14,5,5,12,14,14]},
+    {t:'熱量と寄り添いが混ざった独特の雰囲気',      s:[12,10,5,8,12,12]},
+    {t:'人柄採用・一緒に働きたい人を大切にする',    s:[10,8,5,14,10,14]},
+    {t:'社内で長くキャリアを積んでいける設計',      s:[8,12,8,10,8,10]},
+    {t:'「売る」より「人生をよくする」を重視',      s:[12,8,5,10,12,14]},
+  ]},
+  {id:'q15',type:'I',
+   text:'細かくて地味な作業が続くとき、自分は？',
+   opts:[
+    {t:'意味を見出しながら淡々とこなせる',         s:[12,8,5,8,14,8]},
+    {t:'誰かのためだと思うと続けられる',           s:[12,5,5,12,12,10]},
+    {t:'工夫を加えながら進める',                 s:[8,12,14,8,10,8]},
+    {t:'意味を感じれば集中できる',               s:[8,10,10,10,10,10]},
+    {t:'得意ではないが、やれる',                 s:[8,8,8,8,8,8]},
+  ]},
+  {id:'q16',type:'R',
+   text:'仲の良い同期に、弱音や本音を吐ける？',
+   opts:[
+    {t:'わりと素直に話せる',                   s:[12,8,8,12,10,12]},
+    {t:'弱さを見せると関係が深まると思っている',    s:[14,5,5,14,12,14]},
+    {t:'信頼できる人には話せる',                 s:[10,8,8,12,10,12]},
+    {t:'行動で乗り越えるタイプ',                 s:[8,14,10,5,8,8]},
+    {t:'自分の中で処理する方が多い',              s:[5,12,12,5,5,5]},
+  ]},
+];
+
+const TYPE_LABELS = {W:'ワクワク系', I:'自己分析系', R:'関わり方系'};
+const TYPE_STYLES = {W:'qtag-w', I:'qtag-i', R:'qtag-r'};
+
+function normalize(raw,minR,maxR){ return Math.round(48+((Math.min(maxR,Math.max(minR,raw))-minR)/(maxR-minR))*52); }
+
+function calcAll(ans){
+  let store=0,area=0,marketing=0,hr=0,trainer=0,match=0;
+  QS.forEach(q=>{
+    const i=ans[q.id]; if(i===undefined) return;
+    const s=q.opts[i].s;
+    store+=s[0];area+=s[1];marketing+=s[2];hr+=s[3];trainer+=s[4];match+=s[5];
+  });
+  const trainerScore=normalize(trainer,0,224);
+  const matchScore=normalize(match,0,224);
+  const storeScore=normalize(store,0,216);
+  const areaScore=normalize(area,0,216);
+  const marketingScore=normalize(marketing,0,216);
+  const hrScore=normalize(hr,0,216);
+  const deptScores={store:storeScore,area:areaScore,marketing:marketingScore,hr:hrScore};
+  const deptOrder=Object.entries(deptScores).sort((a,b)=>b[1]-a[1]);
+  return{trainer:trainerScore,deptMax:deptOrder[0][1],match:matchScore,deptScores,deptOrder,topDeptId:deptOrder[0][0]};
+}
+
+function calcPersonality(ans){
+  // ── MBTI 4軸スコア ──
+  // E/I: 外向(+) vs 内向(-)
+  // S/N: 現実(+) vs 直感(-)
+  // T/F: 論理(+) vs 感情(-)
+  // J/P: 計画(+) vs 柔軟(-)
+  let ei=0,sn=0,tf=0,jp=0;
+
+  // Q01 テンション上がる瞬間
+  const q01=ans['q01'];
+  if(q01===0){ei+=2;sn-=1;tf-=2;}      // 誰かが変わった瞬間 → E,F
+  else if(q01===1){ei+=2;tf+=1;jp+=2;} // チーム目標達成 → E,T,J
+  else if(q01===2){ei-=1;sn+=2;tf+=1;} // アイデアが形に → N,T
+  else if(q01===3){ei+=2;tf-=2;}       // 仲間と本音 → E,F
+  else if(q01===4){ei-=1;tf+=2;jp+=1;} // 自分の数字 → I,T,J
+
+  // Q02 3年後ビジョン
+  const q02=ans['q02'];
+  if(q02===0){ei-=1;sn-=1;jp+=1;}      // プロとして独り立ち → I,S,J
+  else if(q02===1){ei+=2;tf+=1;jp+=2;} // マネジメント → E,T,J
+  else if(q02===2){ei-=1;sn-=1;tf-=1;jp+=1;} // 組織内側 → I,S,F,J
+  else if(q02===3){ei+=1;sn+=2;tf+=1;jp-=2;} // 発信・成長 → E,N,T,P
+  else if(q02===4){ei-=1;sn+=2;jp-=2;} // 独立 → I,N,P
+
+  // Q03 強み
+  const q03=ans['q03'];
+  if(q03===0){ei+=2;tf-=2;}            // 信頼関係 → E,F
+  else if(q03===1){ei+=1;tf-=2;}       // 安心感 → E,F
+  else if(q03===2){ei+=1;sn-=1;jp-=1;} // 実行力 → E,S,P
+  else if(q03===3){ei-=1;tf-=2;jp+=1;} // 教える → I,F,J
+  else if(q03===4){ei-=2;sn+=2;tf+=2;jp+=1;} // 構造設計 → I,N,T,J
+
+  // Q05 感情コントロール
+  const q05=ans['q05'];
+  if(q05===0){tf+=1;jp+=1;}
+  else if(q05===1){tf+=1;}
+  else if(q05===2){tf+=2;jp+=2;}
+  else if(q05===3){tf-=1;}
+  else if(q05===4){tf-=2;ei+=1;}      // 感情が出やすい → F,E
+
+  // Q06 弱音を吐ける
+  const q06=ans['q06'];
+  if(q06===0){ei+=1;tf-=1;}
+  else if(q06===1){tf-=2;}            // 関係が深まる → F
+  else if(q06===2){ei-=1;}
+  else if(q06===3){ei+=1;tf+=2;jp-=1;} // 行動で乗り越える → E,T,P
+  else if(q06===4){ei-=2;tf+=1;}      // 自分の中で処理 → I,T
+
+  // Q07 給与上がらない時期
+  const q07=ans['q07'];
+  if(q07===0){sn+=1;tf-=1;jp+=1;}
+  else if(q07===1){ei+=1;tf-=1;}
+  else if(q07===2){sn-=1;tf-=1;}
+  else if(q07===3){jp+=1;}
+  else if(q07===4){tf+=2;sn-=1;}     // 数字が出れば → T,S
+
+  // Q08 お客様との関係
+  const q08=ans['q08'];
+  if(q08===0){tf-=2;sn-=1;}          // 長く続く信頼 → F,S
+  else if(q08===1){tf-=1;sn+=1;}     // 人生に役立つ → F,N
+  else if(q08===2){tf-=2;ei+=1;}     // 安心感 → F,E
+  else if(q08===3){tf+=1;jp+=1;}     // 期待以上の結果 → T,J
+  else if(q08===4){tf+=2;sn-=1;jp+=1;} // 効率よく → T,S,J
+
+  // Q09 輝ける場面
+  const q09=ans['q09'];
+  if(q09===0){ei-=1;tf-=2;}          // 一対一 → I,F
+  else if(q09===1){ei+=2;tf+=1;jp+=1;} // チームを引っ張る → E,T,J
+  else if(q09===2){sn+=2;tf+=1;jp-=1;} // アイデア実現 → N,T,P
+  else if(q09===3){ei+=1;tf-=2;}     // ありがとう → E,F
+  else if(q09===4){sn-=1;jp+=2;}     // 積み上げが結実 → S,J
+
+  // Q11 業界への興味
+  const q11=ans['q11'];
+  if(q11===0){tf-=1;sn+=1;}          // 変化・成長に関わる → F,N
+  else if(q11===1){sn-=2;tf-=1;}     // 体・健康への関心 → S,F
+  else if(q11===2){tf-=1;}
+  else if(q11===3){tf+=1;sn+=1;}     // ビジネス的成長 → T,N
+  else if(q11===4){ei+=1;}
+
+  // Q12 3年後どんな自分
+  const q12=ans['q12'];
+  if(q12===0){ei+=1;tf+=1;jp+=2;}    // マネジメント → E,T,J
+  else if(q12===1){ei-=1;sn-=2;jp+=1;} // プロ独り立ち → I,S,J
+  else if(q12===2){sn+=1;tf+=2;jp+=1;} // 幹部候補 → N,T,J
+  else if(q12===3){ei-=1;tf-=1;jp+=1;} // 組織内側 → I,F,J
+  else if(q12===4){sn+=2;jp-=2;}     // 独立 → N,P
+
+  // Q13 強み
+  const q13=ans['q13'];
+  if(q13===0){ei+=1;tf-=2;}          // 空気をつくる → E,F
+  else if(q13===1){ei-=1;sn-=1;jp-=1;} // 実行力 → I,S,P
+  else if(q13===2){tf-=1;jp+=1;}     // 教える → F,J
+  else if(q13===3){ei+=2;tf-=2;}     // 信頼関係 → E,F
+  else if(q13===4){ei-=2;sn+=2;tf+=2;jp+=1;} // 論理設計 → I,N,T,J
+
+  // Q14 長期的に大切にしたいこと
+  const q14=ans['q14'];
+  if(q14===0){tf-=1;sn-=1;}          // お客様に深く → F,S
+  else if(q14===1){ei+=1;tf-=1;jp+=1;} // 組織・後輩 → E,F,J
+  else if(q14===2){ei+=1;tf+=1;jp+=2;} // 会社と成長 → E,T,J
+  else if(q14===3){jp+=1;}
+  else if(q14===4){jp-=1;}           // ライフスタイル → P
+
+  // ── 4文字決定 ──
+  const E = ei>=0 ? 'E' : 'I';
+  const S = sn<=0 ? 'S' : 'N';
+  const T = tf>=0 ? 'T' : 'F';
+  const J = jp>=0 ? 'J' : 'P';
+  const mbti = E+S+T+J;
+
+  // ── IQ域推定（思考スタイル軸から） ──
+  let iqScore = 0;
+  // 構造・論理・設計系の選択で加点
+  if(ans['q03']===4) iqScore+=20; // 構造設計が強み
+  if(ans['q13']===4) iqScore+=20; // 論理設計
+  if(ans['q12']===2) iqScore+=10; // 幹部候補志向
+  if(ans['q07']===0) iqScore+=10; // 投資期間と割り切れる
+  if(ans['q01']===2) iqScore+=10; // アイデア実現でテンション
+  if(ans['q09']===2) iqScore+=10; // アイデアを形に
+  if(ans['q02']===3) iqScore+=10; // 戦略・発信志向
+  if(ans['q11']===2) iqScore+=5;  // ビジネス的成長
+
+  let iqRange, iqNote;
+  if(iqScore>=50){ iqRange='115〜130'; iqNote='分析・構造把握型'; }
+  else if(iqScore>=30){ iqRange='105〜120'; iqNote='バランス知性型'; }
+  else if(iqScore>=15){ iqRange='95〜110'; iqNote='実践・対人知性型'; }
+  else{ iqRange='90〜105'; iqNote='感性・直感型'; }
+
+  // ── EQ評価（対人感受性・感情管理軸から） ──
+  let eqScore = 0;
+  if(ans['q01']===0) eqScore+=15; // 誰かの変化に立ち会える
+  if(ans['q01']===3) eqScore+=10; // 仲間と本音
+  if(ans['q03']===0||ans['q03']===1) eqScore+=15; // 信頼・安心感
+  if(ans['q03']===2) eqScore+=5;
+  if(ans['q05']===0||ans['q05']===1||ans['q05']===2) eqScore+=10; // 感情管理できる
+  if(ans['q06']===1) eqScore+=15; // 弱さを見せると関係深まる
+  if(ans['q06']===0||ans['q06']===2) eqScore+=10;
+  if(ans['q08']===0||ans['q08']===1||ans['q08']===2) eqScore+=15; // 信頼・役立つ・安心
+  if(ans['q09']===0||ans['q09']===3) eqScore+=10; // 一対一・ありがとう
+  if(ans['q13']===0||ans['q13']===3) eqScore+=10; // 空気・信頼
+
+  let eqGrade, eqNote;
+  if(eqScore>=80){ eqGrade='A'; eqNote='対人感受性が非常に高い'; }
+  else if(eqScore>=55){ eqGrade='B'; eqNote='バランスのとれた感情知性'; }
+  else if(eqScore>=30){ eqGrade='C'; eqNote='論理優位・共感は選択的'; }
+  else{ eqGrade='D'; eqNote='タスク思考が強い'; }
+
+  return { mbti, iqRange, iqNote, eqGrade, eqNote };
+}
+
+
+function grade(sc){
+  if(sc>=93) return{label:'S+',color:'#b5833a',note:'飛び抜けた適性'};
+  if(sc>=80) return{label:'S', color:'#2a8a52',note:'非常に高い適性'};
+  if(sc>=65) return{label:'A', color:'#3a7eb5',note:'高い適性'};
+  return           {label:'B', color:'#c47a2a',note:'これから開花する'};
+}
+
+const MBTI_PROFILES = {
+  ENFJ:{emoji:'🌟',name:'主人公型',trainer:'人の心を動かす、魂のトレーナー',desc:'お客様の可能性を誰よりも信じ、変化を引き出すことに喜びを感じる。言葉と熱量で人生を変える存在。CHARTで最も「愛される」タイプ。',style:'情熱的・共感力・育成'},
+  ENFP:{emoji:'✨',name:'広報運動家型',trainer:'ワクワクを伝染させる、エネルギー型トレーナー',desc:'好奇心旺盛で、お客様の新しい可能性を一緒に発見していくのが得意。飽きさせない工夫と明るさで継続を生み出す。',style:'自由・創造・熱量'},
+  ENTJ:{emoji:'👑',name:'指揮官型',trainer:'目標から逆算する、戦略型トレーナー',desc:'お客様の目標を明確にして、最短ルートで成果へ導く。数字と成果にこだわりながら、信頼関係も大切にする。',style:'論理・推進力・リーダーシップ'},
+  ENTP:{emoji:'💡',name:'討論者型',trainer:'常識を破る、革新型トレーナー',desc:'型にはまらないアプローチでお客様を飽きさせない。新しい視点を提供し続け、モチベーションを刺激する。',style:'独創・議論・チャレンジ'},
+  INFJ:{emoji:'🔮',name:'提唱者型',trainer:'深く洞察する、魂に寄り添うトレーナー',desc:'お客様の言葉の裏にある本音を読み取り、長期的な変化を静かに支え続ける。信頼の深さは群を抜く。',style:'洞察・誠実・長期的視野'},
+  INFP:{emoji:'🌸',name:'仲介者型',trainer:'共感と優しさで包む、安心型トレーナー',desc:'お客様のペースを大切にしながら、自分らしさを引き出すサポートが得意。プレッシャーをかけず、自然な変化を促す。',style:'共感・柔軟・個別対応'},
+  INTJ:{emoji:'🏗️',name:'建築家型',trainer:'仕組みで成果を出す、設計型トレーナー',desc:'お客様の課題を構造的に分析し、再現性のある解決策を提案。感情より根拠で信頼を獲得するタイプ。',style:'戦略・効率・体系化'},
+  INTP:{emoji:'🔬',name:'論理学者型',trainer:'原理原則を探求する、知的型トレーナー',desc:'「なぜ効果があるのか」を深く理解した上でお客様に伝える。理論的な説明でお客様の納得感を高める。',style:'分析・探求・論理'},
+  ESFJ:{emoji:'🤝',name:'領事官型',trainer:'チームの潤滑油、気配り型トレーナー',desc:'お客様の細かな変化に気づき、いつも温かく迎える。継続率が高く、紹介を自然に生み出す。',style:'気配り・調和・継続'},
+  ESFP:{emoji:'🎉',name:'エンターテイナー型',trainer:'場を明るくする、元気系トレーナー',desc:'一緒にいるだけでお客様が前向きになる。楽しさとエネルギーで、運動習慣の定着を後押しする。',style:'明るさ・即興・楽しさ'},
+  ESTJ:{emoji:'📋',name:'幹部型',trainer:'ルールと成果にこだわる、管理型トレーナー',desc:'明確な目標設定と進捗管理でお客様を確実にゴールへ導く。有言実行の姿勢がお客様の信頼を生む。',style:'実行力・管理・責任感'},
+  ESTP:{emoji:'⚡',name:'起業家型',trainer:'今この瞬間に集中する、即戦力トレーナー',desc:'現場での対応力が高く、お客様の状態を見ながら柔軟に対応。スピード感と行動力でモチベーションを引き出す。',style:'行動・適応・スピード'},
+  ISFJ:{emoji:'🛡️',name:'擁護者型',trainer:'陰でお客様を支える、縁の下の力持ち型',desc:'お客様の小さな変化を見逃さず、長期的に寄り添い続ける。信頼関係が深く、リピート率が高い。',style:'献身・記憶力・安定'},
+  ISFP:{emoji:'🎨',name:'冒険家型',trainer:'感性で寄り添う、アーティスト型トレーナー',desc:'お客様の感情に自然に寄り添い、その日の状態に合わせたセッションを直感的に提供する。',style:'感性・柔軟・個性'},
+  ISTJ:{emoji:'⚙️',name:'管理者型',trainer:'徹底した積み上げで信頼を築く、職人型',desc:'一つひとつを丁寧にこなし、長期的な信頼を積み上げる。再現性が高く、後輩育成でも力を発揮する。',style:'誠実・正確・継続'},
+  ISTP:{emoji:'🔧',name:'巨匠型',trainer:'技術で語る、無口な実力派トレーナー',desc:'言葉より行動・技術でお客様の信頼を獲得する。問題解決能力が高く、身体の課題にアプローチする能力に長ける。',style:'技術・分析・実用'},
+};
+
+
+const DEPT={
+  store:{name:'店舗運営部（施術・トレーニング担当）',short:'店舗現場スタッフ',headline:'人の人生に直接触れる、伴走者型',
+    mc:{high:'人と向き合うことへの強い関心と寄り添い力が見えます。CHARTの現場はお客様の生活・習慣・気持ちの変化に深く関わるライフサポーターに近い仕事。あなたの自然体の温かさが、そのまま最大の武器になる環境です。',mid:'お客様との関係づくりへの興味と、現場で動く力がある。CHARTの施術・トレーニング現場は、技術と人間力が両方育つ環境。入社後の経験の中で、あなたならではの関わり方が確実に育っていきます。',low:'まだ眠っている可能性がたくさんある状態です。「努力して変わった人がお客様に一番影響を与える」というCHARTの文化の中で、あなたの新しい一面が開花するかもしれません。'},
+    strengths:['人との距離を縮める自然体の温かさ','相手のコンディションや感情を感じ取る観察力','安心感・信頼感を生む立ち居振る舞い','継続的な関係から生まれる深い影響力'],
+    growth:['言語化・再現性の習慣を積み上げることで次のステージが開ける','「なぜうまくいったか」を言葉にする力が、後輩育成への道になる'],
+    char:{high:'人と関わることが自然体でできるタイプ。お客様の小さな変化を見逃さず、長期的な関係の中で深い信頼を築いていく。CHARTで最も「愛される人」になれるキャラクターです。',mid:'人への興味と現場への適性が育っている段階。CHARTの環境の中で経験を積むことで、あなただけの「寄り添い方」が確実に形になっていきます。',low:'これからCHARTの現場で磨かれていく原石のような存在。人と関わる中で「自分にしかできない関わり方」を見つけていくプロセスが、あなたのキャリアの核になります。'},
+    timeline:[{period:'〜入社6ヶ月',role:'研修・アシスタントスタッフ',salary:'月給 23〜27万円予想',desc:'施術・トレーニングの基礎を習得しながら、先輩の動きを観察・吸収する時期。技術と同じくらい「お客様との関係づくり」を意識することが、この時期の最大のテーマです。'},{period:'6ヶ月〜1年半',role:'独立担当スタッフ',salary:'月給 27〜32万円予想',desc:'自分のお客様を持ち、継続・指名・信頼を積み上げていく時期。ここでの「人間関係の質」がそのまま評価に直結します。'},{period:'1年半〜2年半',role:'リードトレーナー候補',salary:'月給 32〜38万円予想',desc:'後輩の育成や店舗のムード作りにも関わり始める時期。「自分が変わった経験」がお客様にも後輩にも強い影響を与えるようになります。'},{period:'2年半〜',role:'筆頭リードトレーナー',salary:'月給 38〜（推定45万円前後）',desc:'店舗の技術・サービスの最高責任者として、チーム全体の質を引き上げる存在へ。お客様からの信頼と後輩からの尊敬が、このポジションの最大の報酬です。'}]},
+  area:{name:'店舗運営部（エリア統括・マネジメント）',short:'エリア統括・マネジメント',headline:'チームの熱量を上げる、推進力型',
+    mc:{high:'チームを動かして成果を出すことへの強い志向と、現場への誠実さが見えます。CHARTのエリアマネジメントは「数字」と「人間関係」を同時に動かす仕事。まず現場で信頼を積み上げた上でマネジメントへ上がる順序が、最も強いキャリアになります。',mid:'チームや組織への関心と、成果へのコミット力が育っています。現場での経験を積みながら、あなたならではのリーダーシップスタイルが確立されていきます。',low:'今はまだ、自分自身の経験を積んでいく段階。でもCHARTの現場で「人を動かす喜び」を体験したとき、あなたのマネジメントへの可能性が一気に開くことがあります。'},
+    strengths:['チームを動かす推進力と熱量','目標から逆算する思考と実行力','人の強みを見つけて活かす観察眼','組織の課題を構造的に捉える力'],
+    growth:['現場の温度感を定期的に確認することで、チームの力が最大化される','「なぜやるか」を丁寧に伝えることで、メンバーとの信頼が深まる'],
+    char:{high:'全体像を把握して動くタイプ。目標達成への強いコミットがある一方、現場のメンバーとの関係を大切にすることが長期的な強さに直結する。CHARTが求める「関係性ベースの実力主義」と深く共鳴するキャラクター。',mid:'成果への意欲と人への関心のバランスが育っている段階。CHARTの現場で経験を積むほど、チームを動かす自分のスタイルが明確になっていきます。',low:'リーダーシップの種が、まだ育ちきっていない段階。CHARTでの現場経験が、その種を育てる最高の土壌になります。'},
+    timeline:[{period:'〜入社6ヶ月',role:'研修・現場スタッフ',salary:'月給 23〜27万円予想',desc:'現場の施術・トレーニングを通じて、CHARTの文化・価値観・お客様との関わり方を体で覚える時期。この経験がマネジメントの土台になります。'},{period:'6ヶ月〜1年半',role:'リードスタッフ',salary:'月給 27〜32万円予想',desc:'自分の数字を出しながら、周囲への目配りや後輩サポートも担い始める。「自分もチームも伸びる」状態を作れるかが次のステップの鍵です。'},{period:'1年半〜2年半',role:'サブマネジャー / エリア統括候補',salary:'月給 32〜38万円予想',desc:'複数スタッフのマネジメントや店舗の売上責任を担う。個人の成果より「チームの成果」を喜べる視点が求められる転換期です。'},{period:'2年半〜',role:'店舗運営部 事業責任者',salary:'月給 38〜（推定45万円前後）',desc:'エリア全体の運営戦略・人材配置・売上設計を担う。チームの成功が自分の成功になる、CHARTのマネジメントの醍醐味を味わえるポジションです。'}]},
+  marketing:{name:'マーケティング部',short:'マーケティング担当',headline:'CHARTの魅力を設計・発信する、戦略型',
+    mc:{high:'論理と感性を組み合わせ、CHARTの価値を外に届ける力がある。集客・ブランド・採用マーケなど、会社の成長に直接関わる仕事。現場でお客様に響くものを体感してからのマーケは、施策の精度が格段に上がります。',mid:'情報を整理して発信する力と、戦略的に考える姿勢が育っています。CHARTの現場を知ることで、あなたの発信力が一段と深みを増していきます。',low:'今はまだ、CHARTという会社や文化を深く知っていく段階。現場でお客様の変化を目の当たりにしたとき、「これを伝えたい」という強い動機が生まれることがあります。'},
+    strengths:['情報を構造化して設計する力','発信・言語化の精度と独自性','データと直感を組み合わせた判断力','長期的な視点でブランドを育てる思考'],
+    growth:['現場のリアルを知ることで、施策がより深く刺さるようになる','「まず動いてから調整する」サイクルがマーケの成長を加速させる'],
+    char:{high:'物事を体系的に整理して設計するのが得意なタイプ。CHARTの「人の信頼で広がる」文化を理解した上で発信することで、ファンを生む施策が作れる。',mid:'構造的に考える力と発信への興味が育っている段階。CHARTの文化と現場への理解が深まるほど、施策の精度が上がっていきます。',low:'発信や設計への関心が、まだこれから育っていく段階。CHARTという豊かなコンテンツを持つ会社の中で、「伝えたいこと」を見つけていくプロセスが始まります。'},
+    timeline:[{period:'〜入社6ヶ月',role:'現場体験・マーケ補助',salary:'月給 23〜27万円予想',desc:'まずCHARTの現場・サービス・お客様を深く知る期間。何が人の心を動かすかを体感してからの発信は、説得力が根本から変わります。'},{period:'6ヶ月〜1年半',role:'マーケティング担当',salary:'月給 27〜32万円予想',desc:'SNS・Web・広告・採用マーケなどの施策を担当。仮説を立てて動いて検証する、PDCAのサイクルを高速で回していく時期です。'},{period:'1年半〜2年半',role:'マーケティングリード',salary:'月給 32〜38万円予想',desc:'ブランド戦略・エリア展開・採用広報など、会社の成長に直結する上流施策へ。CHARTの顔を作る役割として裁量が広がります。'},{period:'2年半〜',role:'マーケティング部 事業責任者',salary:'月給 38〜（推定45万円前後）',desc:'マーケ戦略の全体設計・予算管理・チームマネジメントを担う。CHARTの認知と集客の最高責任者として、会社の成長エンジンを動かすポジションです。'}]},
+  hr:{name:'人事部・研修教育担当',short:'人事・研修教育担当',headline:'人を育て、組織を強くする、教育型',
+    mc:{high:'人を育てることへの強い使命感と、組織の仕組みを作ることへの適性が見えます。「人への愛情と仕組みへの興味」を両方持っているあなたが、最もCHARTのHRで輝ける存在です。',mid:'人への関心と、組織や仕組みを考える視点が育っています。CHARTの現場を経験してからHRへ関わることで、スタッフから深く信頼されるHR担当になれます。',low:'まだ「育てる」という視点が育ちきっていない段階。でもCHARTの中で先輩に育ててもらった経験が、将来「自分が誰かを育てたい」という強い動機になることがあります。'},
+    strengths:['人の話を深く聞く傾聴力','その人が何を必要としているか感じ取る感度','教える・伝える・体系化する力','組織の空気と関係性を読む眼'],
+    growth:['「与えながら自分も満たす」感覚を育てることが長期的な強みになる','「仕組みに落とす」視点を持つことで、個人の頑張りが組織全体の力になる'],
+    char:{high:'人の話を深く聞き、その人が何を必要としているかを直感的に把握できるタイプ。CHARTの「愛される人が強い」文化の中で、育成担当として大きな影響力を持てる存在。',mid:'人への関心と育成への興味が育っている段階。現場でお客様や仲間と関わる中で、「人を育てる」ことへの自分なりの答えが見えてきます。',low:'育成や組織への関心が、これから芽吹いていく段階。CHARTの中で「誰かに感謝された経験」が積み重なるほど、その芽は確実に育っていきます。'},
+    timeline:[{period:'〜入社6ヶ月',role:'現場研修・HR補助',salary:'月給 23〜27万円予想',desc:'現場スタッフとしてCHARTの価値観・文化・人との関わり方を体で学ぶ時期。現場を知っているHR担当は、スタッフから深く信頼されます。'},{period:'6ヶ月〜1年半',role:'HR担当 / 研修トレーナー',salary:'月給 27〜32万円予想',desc:'採用面接・OJT設計・研修実施などを担当。「仕組みに落とす」視点を育てることがこの時期の大きなテーマです。'},{period:'1年半〜2年半',role:'HRリード / 研修責任者',salary:'月給 32〜38万円予想',desc:'採用計画・評価制度・研修体系など組織全体を設計する役割へ。CHARTの「人材戦略」を担う存在として、経営視点が求められるようになります。'},{period:'2年半〜',role:'人事部 事業責任者',salary:'月給 38〜（推定45万円前後）',desc:'採用・育成・組織設計の全体責任者として、CHARTという組織の土台を作る存在へ。「人が育つ組織」を設計できるHRは、会社の成長を底から支えます。'}]},
+};
+
+function ck(sc){ return sc>=72?'high':sc>=55?'mid':'low'; }
+function overallMsg(sc,topId){
+  const d=DEPT[topId]; const avg=Math.round((sc.trainer+sc.deptMax+sc.match)/3);
+  if(avg>=80) return `3つのスコアがいずれも高く、CHARTという環境との深い親和性が見えます。${d.headline}として、入社初日から自分らしさを発揮しながら成長していける素地が整っています。CHARTが大切にする「愛と信頼で人の人生を変える」という価値観と、あなたの根っこにあるものは、きっと共鳴し合うはずです。`;
+  if(avg>=65) return `全体的に安定した適性が見えます。${d.short}として、現場で経験を積みながら、あなたならではの関わり方を育てていけるタイプです。CHARTは「伸びしろと素直さ」を大切にする組織。今の時点のスコアよりも、入社後の成長スピードの方が、ずっと重要です。`;
+  return `今はまだ、いくつかの軸でこれから伸びていく余地がある状態です。それはむしろ、CHARTという環境の中で大きく変化できる可能性とも言えます。「努力して変わった人が、お客様にも強い影響を与える」—これはCHARTの現場で繰り返し起きていることです。あなたの素直さと熱量が、最大の武器になります。`;
+}
+
+let S={phase:'start',qi:0,ans:{},name:'',email:''};
+function go(){ document.getElementById('app').innerHTML=view(); bind(); }
+
+function view(){
+  if(S.phase==='start') return vStart();
+  if(S.phase==='info') return vInfo();
+  if(S.phase==='q') return vQ();
+  if(S.phase==='sending') return `<div class="sending"><div class="spin"></div>結果を送信しています...</div>`;
+  if(S.phase==='result') return vResult();
+  return '';
+}
+
+function vStart(){
+  return `
+  <p style="font-size:13px;color:var(--sub);line-height:1.9;margin-bottom:30px;text-align:center">所要時間：約3〜5分。正直に答えるほど精度が上がります。</p>
+  <div class="sgrid">
+    <div class="sc"><div class="sc-n">01</div><div class="sc-t">16の質問に答える</div><div class="sc-d">ワクワク感・強み・価値観を多角的に把握します</div></div>
+    <div class="sc"><div class="sc-n">02</div><div class="sc-t">3軸で分析</div><div class="sc-d">トレーナー適性・事業部適性・CHARTとの相性を算出します</div></div>
+    <div class="sc"><div class="sc-n">03</div><div class="sc-t">キャリアが見える</div><div class="sc-d">半年・1年・3年後の姿と給与レンジを提示します</div></div>
+  </div>
+  <div class="center"><button class="btn btn-p" id="b-start">診断を始める →</button></div>`;
+}
+
+function vInfo(){
+  return `
+  <div style="margin-bottom:32px">
+    <div style="font-family:'Shippori Mincho',serif;font-size:1.3rem;font-weight:600;margin-bottom:8px">はじめに教えてください</div>
+    <p style="font-size:13px;color:var(--sub);line-height:1.8">診断結果を正確にお届けするために、お名前を入力してください。</p>
+  </div>
+  <div style="margin-bottom:20px">
+    <label style="display:block;font-size:12px;font-weight:700;margin-bottom:8px;letter-spacing:.05em">
+      お名前 <span style="color:var(--accent);font-size:10px;margin-left:6px">必須</span>
+    </label>
+    <input id="inp-name" type="text" placeholder="例）山田 太郎"
+      value="${S.name}"
+      style="width:100%;background:var(--surface);border:1.5px solid var(--border);padding:13px 16px;font-family:'Noto Sans JP',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .2s;"
+      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+  </div>
+
+  <div id="name-error" style="display:none;color:var(--accent);font-size:12px;margin-bottom:12px">※ お名前を入力してください</div>
+  <div class="center"><button class="btn btn-p" id="b-info-next">診断を始める →</button></div>
+  <div style="text-align:center;margin-top:16px">
+    <button class="btn btn-g" id="b-back-start" style="font-size:12px;padding:8px 20px">← 戻る</button>
+  </div>`;
+}
+
+function vQ(){
+  const q=QS[S.qi]; const pct=Math.round(S.qi/QS.length*100);
+  const opts=q.opts.map((o,i)=>{
+    const sel=S.ans[q.id]===i?'sel':'';
+    return `<button class="opt ${sel}" data-i="${i}"><span class="ok">${String.fromCharCode(65+i)}</span>${o.t}</button>`;
+  }).join('');
+  return `
+  <div class="prog">
+    <div class="pmeta"><span>Q${S.qi+1} / ${QS.length}</span><span>${pct}%</span></div>
+    <div class="ptrack"><div class="pfill" style="width:${pct}%"></div></div>
+  </div>
+  <div class="qcard">
+    <span class="qnum">QUESTION ${String(S.qi+1).padStart(2,'0')}</span>
+    
+    <div class="qtext">${q.text}</div>
+    ${q.sub?`<div class="qsub">${q.sub}</div>`:''}
+    <div class="opts">${opts}</div>
+  </div>
+  <div class="nav">${S.qi>0?`<button class="btn btn-g" id="b-prev">← 戻る</button>`:''}</div>`;
+}
+
+function vResult(){
+  const sc=calcAll(S.ans); const topD=DEPT[sc.topDeptId]; const k=ck(sc.deptMax);
+  const personality=calcPersonality(S.ans);
+  function scardDept(sc){
+    const score=sc.deptMax;
+    const g=grade(score);
+    const pct=((score-48)/52*100).toFixed(0);
+    const deptShort=DEPT[sc.topDeptId].short;
+    return `<div class="scard"><span class="scard-label">❷ 事業部適性</span><div class="scard-num" style="color:${g.color}">${score}</div><div class="scard-bar"><div class="scard-fill" style="width:0%;background:${g.color}" data-w="${pct}"></div></div><div class="scard-grade" style="color:${g.color}">Grade ${g.label}</div><div class="scard-note" style="font-weight:700;color:var(--accent)">${deptShort}</div></div>`;
+  }
+  function scard(label,score){
+    const g=grade(score); const pct=((score-45)/55*100).toFixed(0);
+    return `<div class="scard"><span class="scard-label">${label}</span><div class="scard-num" style="color:${g.color}">${score}</div><div class="scard-bar"><div class="scard-fill" style="width:0%;background:${g.color}" data-w="${pct}"></div></div><div class="scard-grade" style="color:${g.color}">Grade ${g.label}</div><div class="scard-note">${g.note}</div></div>`;
+  }
+  const deptCards=sc.deptOrder.map(([id,raw],i)=>{
+    const d=DEPT[id]; const notes=['最も適性が高い部署','次点で向いている部署','経験次第で活躍できる部署','入社後の成長で近づける部署'];
+    return `<div class="dept ${i===0?'best':''}">${i===0?'<span class="bbadge">BEST FIT</span>':''}<div class="dname">${d.name}</div><div class="dscore">${raw}<span>/100</span></div><div class="dnote">${notes[i]}</div></div>`;
+  }).join('');
+  const tlHtml=topD.timeline.map(t=>`<div class="tl-item"><div class="tl-period">${t.period}</div><div class="tl-role">${t.role}</div><div class="tl-salary">${t.salary}</div><div class="tl-desc">${t.desc}</div></div>`).join('');
+  return `
+  <div class="rtop"><div class="badge">Analysis Complete</div><h2>${S.name ? S.name + 'さんの' : 'あなたの'}CHARTキャリア診断</h2><div class="htag">「${topD.headline}」</div></div>
+  <div class="s3">${scard('❶ トレーナー適性',sc.trainer)}${scardDept(sc)}${scard('❸ CHARTマッチ度',sc.match)}</div>
+  <div class="rsec"><span class="rlabel">CHART × あなたの可能性</span><div class="rbody">${topD.mc[k]}</div></div>
+  <div class="rsec"><span class="rlabel">あなたの強みと、これから育つ力</span>
+    <div class="sw-head" style="color:#2a8a52">▲ 今すぐ活きる強み</div>
+    <div class="tags">${topD.strengths.map(s=>`<span class="tag tag-s">${s}</span>`).join('')}</div>
+    <div class="sw-head" style="color:var(--accent2)">◆ CHARTの中で育っていく力</div>
+    <div class="tags">${topD.growth.map(g=>`<span class="tag tag-g">${g}</span>`).join('')}</div>
+    <div class="rbody" style="margin-top:20px">${topD.char[k]}</div>
+  </div>
+  <div class="rsec"><span class="rlabel">CAREER ROADMAP</span><div class="tl">${tlHtml}</div></div>
+  <div class="rsec"><span class="rlabel">DEPARTMENT FIT</span><div class="depts">${deptCards}</div></div>
+  <div class="rsec">
+    <span class="rlabel">PERSONALITY PROFILE</span>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+      <div style="text-align:center;background:var(--bg);border:1px solid var(--border);padding:16px 10px">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px">推定MBTI</div>
+        <div style="font-family:'Shippori Mincho',serif;font-size:1.8rem;color:var(--accent);line-height:1">${personality.mbti}</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:4px">${MBTI_PROFILES[personality.mbti]?.name||''}</div>
+      </div>
+      <div style="text-align:center;background:var(--bg);border:1px solid var(--border);padding:16px 10px">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px">推定IQ域</div>
+        <div style="font-family:'Shippori Mincho',serif;font-size:1.2rem;color:var(--accent);line-height:1.2">${personality.iqRange}</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:4px">${personality.iqNote}</div>
+      </div>
+      <div style="text-align:center;background:var(--bg);border:1px solid var(--border);padding:16px 10px">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px">EQ評価</div>
+        <div style="font-family:'Shippori Mincho',serif;font-size:2rem;color:var(--accent2);line-height:1">${personality.eqGrade}</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:4px">${personality.eqNote}</div>
+      </div>
+    </div>
+    ${(()=>{const p=MBTI_PROFILES[personality.mbti];if(!p)return '';return `
+    <div style="background:var(--al);border:1px solid var(--accent);padding:20px;margin-top:4px">
+      <div style="font-size:2rem;margin-bottom:8px">${p.emoji}</div>
+      <div style="font-family:'Shippori Mincho',serif;font-size:1.1rem;font-weight:600;margin-bottom:6px;color:var(--text)">${p.trainer}</div>
+      <div style="font-size:13px;color:var(--sub);line-height:1.8;margin-bottom:10px">${p.desc}</div>
+      <div style="font-size:11px;color:var(--accent);font-weight:700">スタイル：${p.style}</div>
+    </div>`;})()}
+  </div>
+    <div class="rsec"><span class="rlabel">あなたへのメッセージ</span><div class="rtitle">${topD.short}として、CHARTで進化できる</div><div class="rbody">${overallMsg(sc,sc.topDeptId)}</div></div>
+  <div class="rsec" style="background:var(--al);border-color:var(--accent)">
+    <span class="rlabel">結果をメールで受け取る</span>
+    <div class="rbody" style="margin-bottom:16px">この診断結果をメールで保存しておきたい方は下のボタンをタップしてください。</div>
+    <div style="display:grid;gap:10px">
+    <button class="btn btn-p" id="b-mail" style="width:100%">📋 診断結果をコピーする</button>
+    <button class="btn btn-p" id="b-line-add" style="width:100%;background:#06C755">💬 STEP1: CHARTのLINEを友だち追加</button>
+    <button class="btn btn-p" id="b-line" style="width:100%;background:#05a847">📨 STEP2: LINEで診断結果を送る</button>
+  </div>
+  <div<div id="copy-msg" style="display:none;margin-top:12px;font-size:12px;color:#2a8a52;font-weight:700">✅ コピーしました！LINEやメールに貼り付けてください</div></div>
+  <div id="copy-preview" style="display:none;margin-top:20px;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);padding:20px 18px;text-align:left">
+    <div style="font-size:10px;letter-spacing:.2em;color:var(--accent);font-weight:700;margin-bottom:12px">コピー内容プレビュー</div>
+    <pre id="copy-text" style="font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--sub);line-height:1.8;white-space:pre-wrap;word-break:break-word"></pre>
+  </div>
+  </div>
+  <div class="center" style="margin-top:40px"><button class="btn btn-g" id="b-restart">もう一度診断する</button></div>`;
+}
+
+async function sendToSpreadsheet(sc){ /* 無効化 */ }
+
+function bind(){
+  document.getElementById('b-start')?.addEventListener('click',()=>{S.phase='info';go();});
+  document.getElementById('b-info-next')?.addEventListener('click',()=>{
+    const name=document.getElementById('inp-name')?.value.trim();
+    if(!name){document.getElementById('name-error').style.display='block';return;}
+    S.name=name; S.email=''; S.phase='q'; S.qi=0; go();
+  });
+  document.getElementById('b-back-start')?.addEventListener('click',()=>{S.phase='start';go();});
+  document.querySelectorAll('.opt').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      S.ans[QS[S.qi].id]=parseInt(btn.dataset.i);
+      setTimeout(()=>{
+        if(S.qi<QS.length-1){S.qi++;go();}
+        else{
+          S.phase='result'; go();
+        }
+      },150);
+    });
+  });
+  document.getElementById('b-prev')?.addEventListener('click',()=>{if(S.qi>0){S.qi--;go();}});
+
+  document.getElementById('b-mail')?.addEventListener('click',()=>{
+    const sc=calcAll(S.ans);
+    const topD=DEPT[sc.topDeptId];
+    const personality=calcPersonality(S.ans);
+    const mbtiP=MBTI_PROFILES[personality.mbti]||{};
+    const name=S.name||'あなた';
+    const email=S.email||'';
+    const subject=encodeURIComponent(`【CHART キャリア診断結果】${name}さんの診断レポート`);
+    const body=encodeURIComponent(
+`━━━━━━━━━━━━━━━━━━━━━━━━
+🏆 ${name}さんの CHART キャリア診断結果
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+【 タイプ 】
+${mbtiP.emoji||''}「${topD.headline}」
+
+【 スコア 】
+❶ トレーナー適性　：${sc.trainer}点
+❷ 事業部適性　　　：${sc.deptMax}点
+❸ CHARTマッチ度　：${sc.match}点
+
+【 最適部署 】
+★ ${topD.name}
+
+【 パーソナリティ 】
+推定MBTI  ：${personality.mbti}（${mbtiP.name||''}）
+推定IQ域  ：${personality.iqRange}　${personality.iqNote}
+EQ評価　  ：${personality.eqGrade}　${personality.eqNote}
+
+${mbtiP.emoji||''} ${mbtiP.trainer||''}
+${mbtiP.desc||''}
+
+【 今すぐ活きる強み 】
+${topD.strengths.map(s=>'✅ '+s).join('\n')}
+
+【 これから育つ力 】
+${topD.growth.map(s=>'🔷 '+s).join('\n')}
+
+【 キャリアロードマップ 】
+${topD.timeline.map(t=>`📍 ${t.period}
+　役職　：${t.role}
+　給与　：${t.salary}
+　内容　：${t.desc}`).join('\n\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+CHART キャリア診断
+━━━━━━━━━━━━━━━━━━━━━━━━`);
+    const text = decodeURIComponent(body);
+    // プレビュー表示
+    const preview=document.getElementById('copy-preview');
+    const previewText=document.getElementById('copy-text');
+    if(preview && previewText){ previewText.textContent=text; preview.style.display='block'; }
+    // クリップボードコピー
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(()=>{
+        const msg=document.getElementById('copy-msg');
+        if(msg){msg.style.display='block';setTimeout(()=>{msg.style.display='none';},3000);}
+      });
+    } else {
+      const ta=document.createElement('textarea');
+      ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      const msg=document.getElementById('copy-msg');
+      if(msg){msg.style.display='block';setTimeout(()=>{msg.style.display='none';},3000);}
+    }
+  });
+
+
+  document.getElementById('b-line-add')?.addEventListener('click',()=>{
+    window.open('https://lin.ee/reB1ffR','_blank');
+  });
+  document.getElementById('b-line')?.addEventListener('click',()=>{
+    const sc=calcAll(S.ans);
+    const topD=DEPT[sc.topDeptId];
+    const personality=calcPersonality(S.ans);
+    const mbtiP=MBTI_PROFILES[personality.mbti]||{};
+    const name=S.name||'あなた';
+    const text=`━━━━━━━━━━━━━━━━━━━━━━━━
+${mbtiP.emoji||''}【${name}さんのCHARTキャリア診断】
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+タイプ：「${topD.headline}」
+
+【スコア】
+❶トレーナー適性：${sc.trainer}点
+❷事業部適性　　：${sc.deptMax}点
+❸CHARTマッチ度：${sc.match}点
+
+【最適部署】
+★ ${topD.name}
+
+【パーソナリティ】
+MBTI：${personality.mbti}（${mbtiP.name||''}）
+IQ域：${personality.iqRange}
+EQ　：${personality.eqGrade} ${personality.eqNote}
+
+【強み】
+${topD.strengths.map(s=>'✅ '+s).join('\n')}
+
+【キャリアロードマップ】
+${topD.timeline.map(t=>`📍${t.period} ${t.role} ${t.salary}`).join('\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+CHART キャリア診断`;
+    const encoded=encodeURIComponent(text);
+    window.open(`https://line.me/R/share?text=${encoded}`,'_blank');
+  });
+  document.getElementById('b-restart')?.addEventListener('click',()=>{S={phase:'start',qi:0,ans:{},name:'',email:''};go();});
+  if(S.phase==='result'){
+    setTimeout(()=>{ document.querySelectorAll('.scard-fill[data-w]').forEach(el=>{el.style.width=el.dataset.w+'%';}); },200);
+  }
+}
+go();
+</script>
+</body>
+</html>
