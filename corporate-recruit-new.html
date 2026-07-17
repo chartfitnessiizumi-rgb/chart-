@@ -399,6 +399,24 @@ background:var(--grad-tp);-webkit-background-clip:text;background-clip:text;colo
 .bn .no{font-family:var(--en);font-weight:700;font-size:11px;letter-spacing:.26em;color:var(--mutd);display:block;margin-bottom:12px}
 @media(max-width:960px){.bn-grid{grid-template-columns:1fr 1fr}.bn h3{min-height:0}}
 @media(max-width:520px){.bn-grid{grid-template-columns:1fr}}
+/* 働き方3択フィーチャー */
+.wstyle{display:flex;flex-wrap:wrap;gap:clamp(18px,3vw,36px);align-items:center;justify-content:space-between;
+background:linear-gradient(120deg,rgba(122,220,230,.16),rgba(255,166,196,.2));border:1px solid rgba(247,111,161,.32);
+border-radius:var(--r);padding:clamp(24px,4vw,40px) clamp(22px,4vw,44px);margin-top:clamp(36px,5vw,56px)}
+.ws-badge{font-family:var(--en);font-weight:700;font-size:11px;letter-spacing:.3em;margin-bottom:8px;
+background:var(--grad-tp);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ws-l h3{font-weight:900;font-size:clamp(1.15rem,3.2vw,1.5rem);letter-spacing:.06em;margin-bottom:6px}
+.ws-l p{font-size:14.5px;color:var(--mutd)}
+.ws-r{display:flex;align-items:center;gap:clamp(12px,2vw,20px)}
+.ws-chip{background:#fff;border:1px solid var(--lined);border-radius:16px;padding:14px 24px;text-align:center;box-shadow:0 10px 24px rgba(140,100,200,.10);transition:transform .3s}
+.ws-chip:hover{transform:translateY(-3px)}
+.ws-chip b{display:block;font-family:var(--en);font-weight:700;font-size:clamp(1.6rem,4.5vw,2.2rem);line-height:1.1;
+background:var(--grad-tp);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ws-chip b em{font-style:normal;font-family:var(--jp);font-weight:900;font-size:.5em;-webkit-text-fill-color:var(--txd);color:var(--txd)}
+.ws-chip span{font-size:12px;font-weight:700;color:var(--mutd);letter-spacing:.06em}
+.ws-chip i{display:block;font-style:normal;font-family:var(--en);font-weight:700;font-size:10px;letter-spacing:.3em;color:var(--pink);margin-bottom:2px}
+.ws-arrow{font-family:var(--en);font-weight:700;color:var(--lav);font-size:20px}
+.ws-chip.max{border-color:var(--pink2);box-shadow:0 12px 28px rgba(247,111,161,.2)}
 
 /* ---------- shindan / gallery / company ---------- */
 .shindan{position:relative;display:flex;align-items:center;justify-content:space-between;gap:20px;overflow:hidden;border-radius:var(--r);
@@ -994,6 +1012,19 @@ background:linear-gradient(160deg,var(--deep1) 0%,#241E3E 100%)}
     <div class="shead"><span class="en">BENEFITS</span><span class="bar"></span><span class="jp">休日・福利厚生</span><span class="spark">✦</span></div>
     <div class="body rv" style="max-width:720px">
       <p>安心して長く働ける環境を整えています。<br>CHARTでは、社員の「健康」「成長」「暮らし」をしっかり支えるために、以下のような制度を整えています。<br>トレーナーとしても、一人の社会人としても、安心してキャリアを築いていける環境です。</p>
+    </div>
+
+    <div class="wstyle rv">
+      <div class="ws-l">
+        <p class="ws-badge">WORK STYLE</p>
+        <h3>選べる、3種類の働き方</h3>
+        <p>働き方は3種類から選択でき、最大で完全週休2.5日にできます。</p>
+      </div>
+      <div class="ws-r" aria-hidden="true">
+        <div class="ws-chip"><b><span class="cnt" data-to="3">3</span></b><span>種類から選択</span></div>
+        <span class="ws-arrow">→</span>
+        <div class="ws-chip max"><i>MAX</i><b>完全週休2.5<em>日</em></b></div>
+      </div>
     </div>
     <div class="bn-grid">
       <div class="bn rv"><span class="no">01</span><h3>完全週休2日制</h3><p>年末年始休暇とあわせて、メリハリある働き方を実現しています。</p></div>
