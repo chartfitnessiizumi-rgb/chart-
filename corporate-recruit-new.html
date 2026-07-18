@@ -38,8 +38,8 @@ a{color:inherit;text-decoration:none}
 /* ---------- intro / progress ---------- */
 .intro{position:fixed;inset:0;background:linear-gradient(135deg,var(--teal2) 0%,var(--pink2) 100%);z-index:90;
 display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;pointer-events:none;animation:introOut .75s cubic-bezier(.7,0,.2,1) 1.5s forwards}
-html.js .intro{animation:none;pointer-events:auto;cursor:pointer}
-.intro.go{animation:introOut .75s cubic-bezier(.7,0,.2,1) forwards;pointer-events:none}
+html.js .intro{animation:introOut .75s cubic-bezier(.7,0,.2,1) 3.2s forwards;pointer-events:auto;cursor:pointer}
+.intro.go{animation:introOut .75s cubic-bezier(.7,0,.2,1) 0s forwards;pointer-events:none}
 @keyframes introOut{to{transform:translateY(-101%);border-radius:0 0 50% 50%}}
 .intro-hint{font-family:var(--en);font-weight:700;font-size:11px;letter-spacing:.32em;color:rgba(255,255,255,.9);
 opacity:0;animation:introIn .5s ease .55s forwards,hintPulse 1.7s ease 1.3s infinite}
@@ -155,16 +155,16 @@ font-size:clamp(3.5rem,11.5vw,8.2rem);letter-spacing:.02em;color:transparent;
 .shead .spark{font-size:15px;color:var(--pink);line-height:1}
 /* 見出し演出：全セクション保証（.sec.in 起点） */
 html.js .shead .en{clip-path:inset(0 100% 0 0);transform:translateX(-14px)}
-html.js .sec.in .shead .en{animation:enIn .8s cubic-bezier(.22,1,.36,1) .12s both}
+html.js .shead.in .en{animation:enIn .7s cubic-bezier(.22,1,.36,1) 0s both}
 @keyframes enIn{to{clip-path:inset(0 -6% 0 0);transform:none}}
 html.js .shead .bar{transform:scaleX(0);transform-origin:left}
-html.js .sec.in .shead .bar{animation:barIn .6s cubic-bezier(.22,1,.36,1) .5s both}
+html.js .shead.in .bar{animation:barIn .55s cubic-bezier(.22,1,.36,1) .3s both}
 @keyframes barIn{to{transform:scaleX(1)}}
 html.js .shead .jp{opacity:0;transform:translateY(10px)}
-html.js .sec.in .shead .jp{animation:jpIn .6s ease .62s both}
+html.js .shead.in .jp{animation:jpIn .55s ease .42s both}
 @keyframes jpIn{to{opacity:1;transform:none}}
 html.js .shead .spark{opacity:0;transform:scale(0) rotate(-90deg)}
-html.js .sec.in .shead .spark{animation:sparkIn .55s cubic-bezier(.3,1.6,.5,1) .8s both}
+html.js .shead.in .spark{animation:sparkIn .5s cubic-bezier(.3,1.6,.5,1) .58s both}
 @keyframes sparkIn{to{opacity:1;transform:scale(1) rotate(0)}}
 .lead{position:relative;z-index:1;font-weight:900;font-size:clamp(1.5rem,4.5vw,2.6rem);line-height:1.68;letter-spacing:.045em;margin-bottom:clamp(30px,5vw,56px);padding-bottom:.38em}
 .lead::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:4px;border-radius:4px;background:var(--grad-tri);transform:scaleX(0);transform-origin:left}
@@ -205,10 +205,10 @@ html.js .ghost{opacity:0;transform:scale(1.6)}
 html.js .sec.in .ghost{animation:stampT .7s cubic-bezier(.25,1.25,.4,1) .22s both}
 @keyframes stampT{0%{opacity:0;transform:scale(1.6)}60%{opacity:1}100%{opacity:1;transform:scale(1)}}
 html.js .lm>span{transform:translateY(115%)}
-html.js .sec.in .lm>span{animation:lmT .8s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(.4s + var(--l,0)*.11s)}
+html.js .creed-title.in .lm>span,html.js .lead.in .lm>span{animation:lmT .8s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(.05s + var(--l,0)*.11s)}
 @keyframes lmT{to{transform:none}}
 html.js .lead::after{transform:scaleX(0)}
-html.js .sec.in .lead::after{animation:drawT .8s cubic-bezier(.22,1,.36,1) .7s both}
+html.js .lead.in::after{animation:drawT .8s cubic-bezier(.22,1,.36,1) .3s both}
 @keyframes drawT{to{transform:scaleX(1)}}
 html.js .biz-card .k{opacity:0;transform:scale(1.45)}
 html.js .sec.in .biz-card .k{animation:stampT .65s cubic-bezier(.25,1.25,.4,1) .5s both}
@@ -527,7 +527,7 @@ background:linear-gradient(160deg,var(--deep1) 0%,#241E3E 100%)}
   .intro,.pbar,#lifestream,.snd{display:none}
   .rise>span{transform:none;animation:none}.hero-v{opacity:1;animation:none}
   .hl i,.hm>span{transform:none;animation:none;opacity:1}
-  .rv,.lm>span,.ghost,.biz-card .k,.gal-it,.hero-in,.step,
+  .rv,.lm>span,.hm>span,.ghost,.biz-card .k,.gal-it,.hero-in,.step,
   .shead .en,.shead .bar,.shead .jp,.shead .spark{animation:none !important;opacity:1 !important;transform:none !important;clip-path:none !important}
   .pfx img,.hero-bg img{animation:none !important;transform:none !important}
   .lead::after{animation:none !important;transform:scaleX(1) !important}
@@ -563,7 +563,7 @@ background:linear-gradient(160deg,var(--deep1) 0%,#241E3E 100%)}
     <line class="sl" x1="4" y1="20" x2="20" y2="4"/>
   </svg>
 </button>
-<div class="intro" id="intro" aria-hidden="true">
+<div class="intro" id="intro" aria-hidden="true" onclick="this.classList.add('go');document.documentElement.classList.add('lift')">
   <span class="intro-w">CHART <em>GROUP</em></span>
   <span class="intro-hint">TAP TO START</span>
 </div>
@@ -1168,6 +1168,33 @@ background:linear-gradient(160deg,var(--deep1) 0%,#241E3E 100%)}
 
 <script>
 (function(){
+  /* ---- 横断幕の開演制御（音はオプション扱い：失敗しても必ず開く） ---- */
+  var intro=document.getElementById('intro');
+  var lifted=false;
+  window.__introLift=function(withSound){
+    if(lifted)return;lifted=true;
+    var go=function(){
+      if(intro)intro.classList.add('go');
+      document.documentElement.classList.add('lift');
+    };
+    var played=false;
+    if(withSound&&window.__liftSnd){try{played=window.__liftSnd()}catch(e){}}
+    if(played){setTimeout(go,320)}else{go()}
+  };
+  if(intro){
+    var tap=function(){
+      if(window.__sndUnlock){try{window.__sndUnlock()}catch(e){}}
+      setTimeout(function(){window.__introLift(true)},130);
+    };
+    intro.addEventListener('click',tap);
+    intro.addEventListener('pointerup',tap);
+  }
+  setTimeout(function(){
+    if(window.__sndUnlock){try{window.__sndUnlock()}catch(e){}}
+    setTimeout(function(){window.__introLift(true)},80);
+  },2600);
+  setTimeout(function(){document.documentElement.classList.add('lift')},3400);
+
   var hd=document.getElementById('hd');
   var sent=document.getElementById('hd-sentinel');
   if(sent && 'IntersectionObserver' in window){
@@ -1193,25 +1220,47 @@ background:linear-gradient(160deg,var(--deep1) 0%,#241E3E 100%)}
 
   if('IntersectionObserver' in window){
     var sio=new IntersectionObserver(function(es){
-      es.forEach(function(e){
-        if(!e.isIntersecting)return;
-        var sec=e.target;sec.classList.add('in');sio.unobserve(sec);
-        var sh=sec.querySelector('.shead .en')||sec.querySelector('.shead');
-        if(sh&&window.__lsHeadBurst){setTimeout(function(){window.__lsHeadBurst(sh)},120)}
-      });
+      es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');sio.unobserve(e.target)}});
     },{threshold:0,rootMargin:'0px 0px -12% 0px'});
     document.querySelectorAll('.sec').forEach(function(el){sio.observe(el)});
 
     var io=new IntersectionObserver(function(es){
-      es.forEach(function(e){
-        if(!e.isIntersecting)return;
-        var el=e.target;el.classList.add('in');io.unobserve(el);
-        if(window.__lsGraph && el.querySelector && el.querySelector('.gline,.ring-fg,.dseg,.tbar,.age-bar,.gbar')){
-          setTimeout(window.__lsGraph,350);
-        }
-      });
+      es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}});
     },{threshold:.12,rootMargin:'0px 0px -6% 0px'});
-    document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+    document.querySelectorAll('.rv').forEach(function(el){if(!isGraph(el))io.observe(el)});
+
+    // 出現＋音の発火：要素の中心が画面上から45%ラインを越えた瞬間（実測）
+    function isGraph(el){return el.querySelector&&el.querySelector('.gline,.ring-fg,.dseg,.tbar,.age-bar,.gbar')}
+    var pend=[];
+    document.querySelectorAll('.shead').forEach(function(el){pend.push({el:el,k:'h'})});
+    document.querySelectorAll('.creed-title,.lead').forEach(function(el){pend.push({el:el,k:'t'})});
+    document.querySelectorAll('.rv').forEach(function(el){if(isGraph(el))pend.push({el:el,k:'g'})});
+    function fireMid(p){
+      p.el.classList.add('in');
+      if(p.k==='h'){
+        var en=p.el.querySelector('.en')||p.el;
+        if(window.__lsHeadBurst){try{window.__lsHeadBurst(en)}catch(err){}}
+      }else if(p.k==='g'&&window.__lsGraph){
+        try{window.__lsGraph()}catch(err){}
+      }
+    }
+    var midTick=false;
+    function checkMid(){
+      midTick=false;
+      if(!pend.length)return;
+      var vh=window.innerHeight,line=vh*.48;
+      for(var i=pend.length-1;i>=0;i--){
+        var r=pend[i].el.getBoundingClientRect();
+        if(r.top>=vh)continue;
+        if(r.bottom<0){pend.splice(i,1);continue}
+        var half=Math.min((r.bottom-r.top)/2,vh*.10);
+        if(r.top+half<=line){fireMid(pend[i]);pend.splice(i,1)}
+      }
+    }
+    var reqMid=function(){if(!midTick){midTick=true;requestAnimationFrame(checkMid)}};
+    window.addEventListener('scroll',reqMid,{passive:true});
+    window.addEventListener('resize',reqMid);
+    setTimeout(checkMid,400);
   }else{
     document.querySelectorAll('.sec,.rv').forEach(function(el){el.classList.add('in')});
   }
@@ -1309,11 +1358,22 @@ background:linear-gradient(160deg,var(--deep1) 0%,#241E3E 100%)}
     src.connect(f);f.connect(g);route(g,wet);
     src.start(t);src.stop(t+dur+.05);
   }
+  function withAudio(fn){
+    if(!sndOn)return;
+    if(!actx)unlock();
+    if(!actx)return;
+    if(actx.state==='running'){fn();return}
+    try{actx.resume()}catch(e){}
+    setTimeout(function(){if(ok())fn()},160);
+  }
   /* 見出し：残響を纏った上昇アルペジオ＋空気のきらめき */
   function sparkleSnd(){
     var now=performance.now();
-    if(!ok()||now-lastSparkle<300)return;
+    if(now-lastSparkle<300)return;
     lastSparkle=now;
+    withAudio(doSparkle);
+  }
+  function doSparkle(){
     var t=actx.currentTime;
     var notes=[1046.5,1174.7,1318.5,1568,1760,2093];
     notes.forEach(function(fr,i){
@@ -1332,8 +1392,11 @@ background:linear-gradient(160deg,var(--deep1) 0%,#241E3E 100%)}
   /* グラフ：デチューンした上昇スイープ＋サブ＋空気 */
   function riser(){
     var now=performance.now();
-    if(!ok()||now-lastRiser<700)return;
+    if(now-lastRiser<700)return;
     lastRiser=now;
+    withAudio(doRiser);
+  }
+  function doRiser(){
     var t=actx.currentTime,dur=.85;
     [-8,8].forEach(function(cents){
       var o=actx.createOscillator();o.type='sawtooth';
@@ -1382,25 +1445,13 @@ background:linear-gradient(160deg,var(--deep1) 0%,#241E3E 100%)}
     });
   }
 
-  /* ---- 横断幕：タップで開演（放置2.6秒で自動） ---- */
-  var intro=document.getElementById('intro'),lifted=false;
-  function lift(withSound){
-    if(lifted)return;lifted=true;
-    var go=function(){
-      if(intro)intro.classList.add('go');
-      document.documentElement.classList.add('lift');
-    };
-    if(withSound&&ok()){liftSnd();setTimeout(go,320)}
-    else go();
-  }
-  if(intro){
-    var tap=function(){unlock();setTimeout(function(){lift(true)},70)};
-    intro.addEventListener('click',tap);
-    intro.addEventListener('touchend',function(e){e.preventDefault();tap()},{passive:false});
-    setTimeout(function(){if(!lifted){unlock();setTimeout(function(){lift(ok())},80)}},2600);
-  }else{
-    document.documentElement.classList.add('lift');
-  }
+  /* ---- 開演音フックの提供（開演制御は本体側。音は鳴らせたらtrueを返す） ---- */
+  window.__sndUnlock=unlock;
+  window.__liftSnd=function(){
+    if(!ok())return false;
+    try{liftSnd()}catch(e){return false}
+    return true;
+  };
 
   /* ---- 銀のパーティクル（音なしスクロール湧き＋見出し同期） ---- */
   if(!ctx)return;
@@ -1461,7 +1512,7 @@ background:linear-gradient(160deg,var(--deep1) 0%,#241E3E 100%)}
   },{passive:true});
   window.__lsHeadBurst=function(el){
     var r=el.getBoundingClientRect();
-    if(r.bottom<0||r.top>H)return;
+    if(r.bottom<-40||r.top>H+80)return;
     sparkleSnd();
     var n=22,dur=640;
     for(var i=0;i<n;i++){
