@@ -176,6 +176,7 @@ html.js .shead.in .spark{animation:sparkIn .5s cubic-bezier(.3,1.6,.5,1) .58s bo
 html.js .rv{opacity:0;transform:translateY(52px) scale(.98)}
 html.js .biz-grid .rv:nth-child(odd),html.js .mem-grid .rv:nth-child(odd),html.js .cul-grid .rv:nth-child(odd){transform:translateX(-52px)}
 html.js .biz-grid .rv:nth-child(even),html.js .mem-grid .rv:nth-child(even),html.js .cul-grid .rv:nth-child(even){transform:translateX(52px)}
+html.js .rv.gr{transform:translateY(34px) scale(.99);transition-duration:.55s}
 html.js .rv.in,html.js .biz-grid .rv.in,html.js .mem-grid .rv.in,html.js .cul-grid .rv.in{opacity:1;transform:none}
 html:not(.js) .hd{background:rgba(255,255,255,.92);border-color:var(--lined)}
 html:not(.js) .hd .hd-logo,html:not(.js) .hd .hd-nav,html:not(.js) .hd .hd-ig{color:var(--txd)}
@@ -253,26 +254,26 @@ background:var(--grad-tri);-webkit-background-clip:text;background-clip:text;col
 .ring circle{fill:none;stroke-width:10;stroke-linecap:round}
 .ring-bg{stroke:rgba(142,124,224,.16)}
 .ring-fg{stroke:url(#grad-ring);stroke-dasharray:327;stroke-dashoffset:var(--off,0)}
-html.js .ring-fg{stroke-dashoffset:327;transition:stroke-dashoffset 1.5s cubic-bezier(.22,1,.36,1) .35s}
+html.js .ring-fg{stroke-dashoffset:327;transition:stroke-dashoffset 1.5s cubic-bezier(.22,1,.36,1) .1s}
 html.js .rv.in .ring-fg{stroke-dashoffset:var(--off,0)}
 .growth{padding-bottom:clamp(20px,3vw,28px)}
 .gsvg{width:100%;height:auto;display:block;margin-top:18px}
 .gline{fill:none;stroke:url(#grad-line);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:760;stroke-dashoffset:0}
-html.js .gline{stroke-dashoffset:760;transition:stroke-dashoffset 1.8s cubic-bezier(.4,0,.2,1) .3s}
+html.js .gline{stroke-dashoffset:760;transition:stroke-dashoffset 1.8s cubic-bezier(.4,0,.2,1) .1s}
 html.js .rv.in .gline{stroke-dashoffset:0}
 .gdot{fill:#fff;stroke:var(--pink);stroke-width:3.5}
 html.js .gdot{opacity:0;transition:opacity .4s ease}
 html.js .rv.in .gdot{opacity:1}
-html.js .rv.in .gdot:nth-of-type(1){transition-delay:.6s}
-html.js .rv.in .gdot:nth-of-type(2){transition-delay:1.2s}
-html.js .rv.in .gdot:nth-of-type(3){transition-delay:1.9s}
+html.js .rv.in .gdot:nth-of-type(1){transition-delay:.45s}
+html.js .rv.in .gdot:nth-of-type(2){transition-delay:.95s}
+html.js .rv.in .gdot:nth-of-type(3){transition-delay:1.5s}
 .glabel{font-family:var(--jp);font-weight:700;font-size:13px;fill:var(--mutd);letter-spacing:.06em}
 .glabel.big{fill:var(--txd);font-size:15px}
 .gaxis{stroke:rgba(90,80,120,.16);stroke-width:1}
 .age-strip{display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px;margin-top:10px}
 .age-bar{flex:1 1 260px;height:14px;border-radius:99px;background:rgba(142,124,224,.14);position:relative;overflow:hidden}
 .age-bar i{position:absolute;left:6%;width:88%;top:0;bottom:0;border-radius:99px;background:var(--grad-tri)}
-html.js .age-bar i{transform:scaleX(0);transform-origin:left;transition:transform 1.2s cubic-bezier(.22,1,.36,1) .4s}
+html.js .age-bar i{transform:scaleX(0);transform-origin:left;transition:transform 1.2s cubic-bezier(.22,1,.36,1) .15s}
 html.js .rv.in .age-bar i{transform:none}
 .age-cap{font-size:13px;color:var(--mutd);font-weight:700;letter-spacing:.08em;display:flex;gap:18px}
 @media(max-width:880px){.stat-grid{grid-template-columns:1fr 1fr}}
@@ -296,8 +297,8 @@ html.js .rv.in .dseg{stroke-dasharray:var(--dl) 440}
 .gbar i{display:block;border-radius:12px 12px 6px 6px}
 .gbar.m i{height:58%;background:linear-gradient(180deg,var(--teal2),var(--teal))}
 .gbar.f i{height:92%;background:linear-gradient(180deg,var(--pink2),var(--pink))}
-html.js .gbar i{transform:scaleY(0);transform-origin:bottom;transition:transform 1.1s cubic-bezier(.22,1,.36,1) .4s}
-html.js .gbar.f i{transition-delay:.55s}
+html.js .gbar i{transform:scaleY(0);transform-origin:bottom;transition:transform 1.1s cubic-bezier(.22,1,.36,1) .15s}
+html.js .gbar.f i{transition-delay:.3s}
 html.js .rv.in .gbar i{transform:none}
 .glab{display:flex;gap:clamp(30px,5vw,52px);padding:0 8px;font-weight:700;font-size:13.5px;color:var(--mutd)}
 .glab span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px;background:var(--teal)}
@@ -342,7 +343,7 @@ html.js .sec.in .step{animation:stepIn .6s cubic-bezier(.3,1.4,.5,1) both;animat
 .th small{font-size:12.5px;font-weight:700;color:var(--mutd);letter-spacing:.04em}
 .tbar{display:flex;height:26px;border-radius:99px;overflow:hidden;background:rgba(142,124,224,.1)}
 .tbar i{display:block;height:100%}
-html.js .tbar i{transform:scaleX(0);transform-origin:left;transition:transform .9s cubic-bezier(.22,1,.36,1) calc(.35s + var(--i,0)*.1s)}
+html.js .tbar i{transform:scaleX(0);transform-origin:left;transition:transform .9s cubic-bezier(.22,1,.36,1) calc(.12s + var(--i,0)*.1s)}
 html.js .rv.in .tbar i{transform:none}
 @media(max-width:620px){.trow{grid-template-columns:1fr}}
 
@@ -1234,7 +1235,7 @@ background:linear-gradient(160deg,var(--deep1) 0%,#241E3E 100%)}
     var pend=[];
     document.querySelectorAll('.shead').forEach(function(el){pend.push({el:el,k:'h'})});
     document.querySelectorAll('.creed-title,.lead').forEach(function(el){pend.push({el:el,k:'t'})});
-    document.querySelectorAll('.rv').forEach(function(el){if(isGraph(el))pend.push({el:el,k:'g'})});
+    document.querySelectorAll('.rv').forEach(function(el){if(isGraph(el)){el.classList.add('gr');pend.push({el:el,k:'g'})}});
     function fireMid(p){
       p.el.classList.add('in');
       if(p.k==='h'){
@@ -1248,13 +1249,14 @@ background:linear-gradient(160deg,var(--deep1) 0%,#241E3E 100%)}
     function checkMid(){
       midTick=false;
       if(!pend.length)return;
-      var vh=window.innerHeight,line=vh*.48;
+      var vh=window.innerHeight;
+      var lineH=vh*.74, lineG=vh*.72; /* 見出し=中心74% / グラフ=頭72% */
       for(var i=pend.length-1;i>=0;i--){
-        var r=pend[i].el.getBoundingClientRect();
+        var p=pend[i],r=p.el.getBoundingClientRect();
         if(r.top>=vh)continue;
         if(r.bottom<0){pend.splice(i,1);continue}
-        var half=Math.min((r.bottom-r.top)/2,vh*.10);
-        if(r.top+half<=line){fireMid(pend[i]);pend.splice(i,1)}
+        var hit = p.k==='g' ? (r.top<=lineG) : ((r.top+r.bottom)/2<=lineH);
+        if(hit){fireMid(p);pend.splice(i,1)}
       }
     }
     var reqMid=function(){if(!midTick){midTick=true;requestAnimationFrame(checkMid)}};
